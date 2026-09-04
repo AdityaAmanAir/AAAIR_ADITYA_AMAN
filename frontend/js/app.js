@@ -262,33 +262,21 @@ function _0x5c2d(st, sc) {
     statsCard.id = 'stats-section';
 
     let html = `<h2 id="stats-title" class="section-title">Live Coding Stats</h2><div id="stats-wrapper" class="stats-wrapper">`;
-    if (st.leetcode && Object.keys(st.leetcode).length > 0) {
-        html += `<div id="stats-block-leetcode" class="item-block stats-block">` +
-            `<div id="stats-label-leetcode" class="item-label">LeetCode</div>` +
-            `<div id="stats-grid-leetcode" class="stats-box-grid">` +
-            `<div id="stat-cell-leetcode-solved" class="stat-cell"><span id="stat-num-leetcode-solved" class="stat-num">${st.leetcode.totalSolved || 0}</span><span id="stat-key-leetcode-solved" class="stat-key">Solved</span></div>` +
-            `<div id="stat-cell-leetcode-acc" class="stat-cell"><span id="stat-num-leetcode-acc" class="stat-num">${st.leetcode.acceptanceRate || 0}%</span><span id="stat-key-leetcode-acc" class="stat-key">Acceptance</span></div>` +
-            `<div id="stat-cell-leetcode-rank" class="stat-cell"><span id="stat-num-leetcode-rank" class="stat-num">#${st.leetcode.ranking || 'N/A'}</span><span id="stat-key-leetcode-rank" class="stat-key">Ranking</span></div>` +
-            `</div></div>`;
-    }
-    if (st.github && Object.keys(st.github).length > 0) {
-        html += `<div id="stats-block-github" class="item-block stats-block">` +
-            `<div id="stats-label-github" class="item-label">GitHub Activity</div>` +
-            `<div id="stats-grid-github" class="stats-box-grid">` +
-            `<div id="stat-cell-github-repos" class="stat-cell"><span id="stat-num-github-repos" class="stat-num">${st.github.public_repos || 0}</span><span id="stat-key-github-repos" class="stat-key">Repos</span></div>` +
-            `<div id="stat-cell-github-followers" class="stat-cell"><span id="stat-num-github-followers" class="stat-num">${st.github.followers || 0}</span><span id="stat-key-github-followers" class="stat-key">Followers</span></div>` +
-            `<div id="stat-cell-github-following" class="stat-cell"><span id="stat-num-github-following" class="stat-num">${st.github.following || 0}</span><span id="stat-key-github-following" class="stat-key">Following</span></div>` +
-            `</div></div>`;
-    }
-    if (st.codeforces && Object.keys(st.codeforces).length > 0) {
-        html += `<div id="stats-block-codeforces" class="item-block stats-block">` +
-            `<div id="stats-label-codeforces" class="item-label">Codeforces</div>` +
-            `<div id="stats-grid-codeforces" class="stats-box-grid">` +
-            `<div id="stat-cell-codeforces-rating" class="stat-cell"><span id="stat-num-codeforces-rating" class="stat-num">${st.codeforces.rating || 0}</span><span id="stat-key-codeforces-rating" class="stat-key">Rating</span></div>` +
-            `<div id="stat-cell-codeforces-max" class="stat-cell"><span id="stat-num-codeforces-max" class="stat-num">${st.codeforces.maxRating || 0}</span><span id="stat-key-codeforces-max" class="stat-key">Max Rating</span></div>` +
-            `<div id="stat-cell-codeforces-rank" class="stat-cell"><span id="stat-num-codeforces-rank" class="stat-num">${st.codeforces.rank || 'unranked'}</span><span id="stat-key-codeforces-rank" class="stat-key">Rank</span></div>` +
-            `</div></div>`;
-    }
+    const metrics = {
+        leetcode: [['totalSolved', 'Solved'], ['easySolved', 'Easy'], ['mediumSolved', 'Medium'], ['hardSolved', 'Hard'], ['ranking', 'Ranking'], ['contestRating', 'Contest Rating']],
+        github: [['publicRepos', 'Repos'], ['followers', 'Followers'], ['following', 'Following'], ['recentEvents', 'Recent Events']],
+        codeforces: [['rating', 'Rating'], ['maxRating', 'Max Rating'], ['contests', 'Contests'], ['submissions', 'Submissions'], ['rank', 'Rank']],
+        kaggle: [], hackerrank: [], hackerearth: []
+    };
+    Object.keys(metrics).forEach((platform) => {
+        const value = st[platform];
+        if (!value) return;
+        const label = value.available ? value.platform : `${value.platform} (profile only)`;
+        let cells = metrics[platform].filter(([key]) => value[key] !== undefined)
+            .map(([key, name]) => `<div class="stat-cell"><span class="stat-num">${value[key]}</span><span class="stat-key">${name}</span></div>`).join('');
+        if (!value.available) cells = `<div class="stat-cell stat-unavailable"><span class="stat-num">-</span><span class="stat-key">Public API unavailable</span></div>`;
+        html += `<div id="stats-block-${platform}" class="item-block stats-block"><a class="item-label stats-platform-link" href="${value.profile}" target="_blank" rel="noopener">${label}</a><div id="stats-grid-${platform}" class="stats-box-grid">${cells}</div></div>`;
+    });
     html += `</div>`;
     statsCard.innerHTML = html;
     grid.prepend(statsCard);
