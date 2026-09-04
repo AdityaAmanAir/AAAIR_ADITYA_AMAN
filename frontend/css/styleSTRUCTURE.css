@@ -1,0 +1,709 @@
+/* ==========================================================================
+   AAAIR PORTFOLIO - COMPREHENSIVE CSS STRUCTURE BLUEPRINT & DOCUMENTATION
+   File: styleSTRUCTURE.css
+   Purpose: Complete DOM hierarchy map, component documentation, and ID/class skeleton.
+   Target Audience: AI agents, developers, and designers analyzing page architecture.
+   ========================================================================== */
+
+/* ── 1. ROOT, HTML & GLOBAL BODY ── */
+/* Document root element. Controls global variables, font scaling, and smooth scroll. */
+html {}
+
+/* Primary body container (<body>, #body, .page-body).
+   Sets global dark-mode backdrop, base typography (Inter/Orbitron), and text rendering. */
+body,
+#body,
+.page-body {}
+
+
+/* ── 2. BACKGROUND OVERLAY LAYER ── */
+/* Fixed canvas/background layer (<div>, #bg-layer, .bg-layer).
+   Direct child of <body>. Holds ambient radial gradients, glowing nebulae, or particle canvas. */
+#bg-layer,
+.bg-layer {}
+
+
+/* ── 3. PAGE WRAPPER & LAYOUT ── */
+/* Main layout wrapper (<div>, #layout-wrapper, .layout-wrapper).
+   Enforces maximum site width (900px), centered margin layout, and z-index positioning. */
+#layout-wrapper,
+.layout-wrapper {}
+
+
+/* ── 4. HEADER & HERO COMPONENT (WORLD-CLASS HERO SKELETON) ── */
+/* Header outer section wrapper (<header>, #header, .header-container). */
+#header,
+.header-container {}
+
+/* World-class Hero outer container (<section>, #hero-section, .hero-section). */
+#hero-section,
+.hero-section {}
+
+/* ── 4.1 Hero Canvas & Dynamic Visual Background Layer ── */
+/* Background canvas layer wrapper (<div>, #hero-bg-layer, .hero-bg-layer). */
+#hero-bg-layer,
+.hero-bg-layer {}
+
+/* Interactive WebGL / Three.js / Particle Network Canvas (<canvas>, #hero-canvas, .hero-canvas).
+   Target for 3D interactive particle sphere, fluid shader, or interactive starfield. */
+#hero-canvas,
+.hero-canvas {}
+
+/* Ambient lighting radial glow spot 1 (<div>, #hero-glow-primary, .hero-glow-primary). */
+#hero-glow-primary,
+.hero-glow-primary {}
+
+/* Ambient lighting radial glow spot 2 (<div>, #hero-glow-secondary, .hero-glow-secondary). */
+#hero-glow-secondary,
+.hero-glow-secondary {}
+
+/* Cyberpunk grid / mesh overlay mask (<div>, #hero-grid-overlay, .hero-grid-overlay). */
+#hero-grid-overlay,
+.hero-grid-overlay {}
+
+/* ── 4.2 Hero Content Container & Layout Grid ── */
+/* Hero inner content container (<div>, #hero-container, .hero-container). */
+#hero-container,
+.hero-container {}
+
+/* Header inner flex stack (<div>, #header-inner, .header-inner, .hero-inner). */
+#header-inner,
+.header-inner,
+.hero-inner {}
+
+/* ── 4.3 Hero Availability Status Badge ── */
+/* Status badge capsule wrapper (<div>, #hero-status-badge, .hero-status-badge). */
+#hero-status-badge,
+.hero-status-badge {}
+
+/* Live pulse radar indicator dot (<span>, #hero-status-pulse, .hero-status-pulse).
+   Target for CSS @keyframes green/violet pulse animation. */
+#hero-status-pulse,
+.hero-status-pulse {}
+
+/* Availability callout string (<span>, #hero-status-text, .hero-status-text).
+   Text: "Available for Research & Engineering" */
+#hero-status-text,
+.hero-status-text {}
+
+/* Status text separator pipe (<span>, #hero-status-divider, .hero-status-divider). */
+#hero-status-divider,
+.hero-status-divider {}
+
+/* Location & cohort badge (<span>, #hero-status-location, .hero-status-location).
+   Text: "VIT Bhopal • 2024–2028" */
+#hero-status-location,
+.hero-status-location {}
+
+/* ── 4.4 Hero Typography Stack & Copywriting ── */
+/* Typography vertical stack (<div>, #hero-typography-stack, .hero-typography-stack). */
+#hero-typography-stack,
+.hero-typography-stack {}
+
+/* Main portfolio hero heading (<h1>, #title, .title, .hero-title).
+   Target for animated gradient text fill, glitch effect, or futuristic typography. */
+#title,
+.title,
+.hero-title {}
+
+/* First name highlight span (<span>, #hero-name-first, .hero-name-first). Text: "ADITYA" */
+#hero-name-first,
+.hero-name-first {}
+
+/* Last name highlight span (<span>, #hero-name-last, .hero-name-last). Text: "AMAN" */
+#hero-name-last,
+.hero-name-last {}
+
+/* Dynamic role rotator container (<div>, #hero-role-wrapper, .hero-role-wrapper). */
+#hero-role-wrapper,
+.hero-role-wrapper {}
+
+/* Role prefix descriptor (<span>, #hero-role-prefix, .hero-role-prefix). Text: "Specialist in " */
+#hero-role-prefix,
+.hero-role-prefix {}
+
+/* Dynamic typewriter / rotating role title (<span>, #hero-role-text, .hero-role-text).
+   Text: "Artificial Intelligence & Machine Learning" */
+#hero-role-text,
+.hero-role-text {}
+
+/* Hero narrative bio paragraph (<p>, #subtitle, .subtitle, .hero-bio). */
+#subtitle,
+.subtitle,
+.hero-bio {}
+
+/* ── 4.5 Hero Interactive Terminal / Code Snippet Widget ── */
+/* Terminal glassmorphism card (<div>, #hero-widget-card, .hero-widget-card).
+   Target for code snippet widget, live execution preview, or interactive prompt. */
+#hero-widget-card,
+.hero-widget-card {}
+
+/* Terminal window title bar (<div>, #hero-terminal-header, .hero-terminal-header). */
+#hero-terminal-header,
+.hero-terminal-header {}
+
+/* Window action control dots wrapper (<div>, #hero-terminal-controls, .hero-terminal-controls). */
+#hero-terminal-controls,
+.hero-terminal-controls {}
+
+/* Red, yellow, green window control dots (<span>, .terminal-dot). */
+#hero-dot-red,
+#hero-dot-yellow,
+#hero-dot-green,
+.terminal-dot {}
+.dot-red {}
+.dot-yellow {}
+.dot-green {}
+
+/* Terminal title bar filename (<span>, #hero-terminal-title, .terminal-title).
+   Text: "aditya@aaair-node:~ (zsh)" */
+#hero-terminal-title,
+.terminal-title {}
+
+/* Terminal content view body (<div>, #hero-terminal-body, .hero-terminal-body). */
+#hero-terminal-body,
+.hero-terminal-body {}
+
+/* Terminal command line prompt row (<div>, .terminal-line). */
+.terminal-line {}
+
+/* Shell prompt symbol (<span>, .terminal-prompt). Text: "$ " */
+.terminal-prompt {}
+
+/* Command executable string (<span>, .terminal-cmd). Text: "cat stack.json" */
+.terminal-cmd {}
+
+/* Command output response array (<span>, .terminal-output).
+   Text: '=> ["C++20", "Python3", "PyTorch", "OpenCV", "Flutter", "WebSockets", "Linux"]' */
+.terminal-output {}
+
+/* ── 4.6 Hero Call-To-Action (CTA) Button Bar ── */
+/* CTA buttons flex container (<div>, #hero-cta-bar, .hero-cta-bar). */
+#hero-cta-bar,
+.hero-cta-bar {}
+
+/* Primary CTA Button (<a>, #hero-cta-contact, .hero-btn-primary).
+   Target for glowing gradient fill, hover elevation, and click ripple. */
+#hero-cta-contact,
+.hero-btn-primary {}
+
+/* Secondary CTA Button (<a>, #hero-cta-comments, .hero-btn-secondary). */
+#hero-cta-comments,
+.hero-btn-secondary {}
+
+/* Quick Email Copy Button (<button>, #hero-btn-copy-email, .hero-btn-icon). */
+#hero-btn-copy-email,
+.hero-btn-icon {}
+
+/* Icon inside copy button (<span>, #hero-copy-icon, .hero-icon). Text: "✉" */
+#hero-copy-icon,
+.hero-icon {}
+
+/* ── 4.7 Hero Social Links & Tech Stack Marquee Banner ── */
+/* Marquee outer wrapper (<div>, #hero-social-wrapper, .hero-social-wrapper, .marquee-container). */
+#hero-social-wrapper,
+.hero-social-wrapper,
+.marquee-container {}
+
+/* Row 1: Forward Marquee (<div>, .marquee-row, .marquee-forward). */
+.marquee-row,
+.marquee-forward {}
+
+/* Row 2: Reverse Marquee (<div>, .marquee-row, .marquee-reverse). */
+.marquee-reverse {}
+
+/* Scrolling track container (<div>, .marquee-track). */
+.marquee-track {}
+
+/* Individual link & tag pill boxes (<a>, .social-link, .marquee-pill). */
+#social-link-0,  /* GitHub */
+#social-link-1,  /* LinkedIn */
+#social-link-2,  /* LeetCode */
+#social-link-3,  /* CodeChef */
+#social-link-4,  /* Codeforces */
+#social-link-5,  /* HackerRank */
+#social-link-6,  /* C++20 */
+#social-link-7,  /* PyTorch */
+#social-link-8,  /* Linux */
+#social-link-10, /* X / Twitter */
+#social-link-11, /* Unstop */
+#social-link-12, /* HackerEarth */
+#social-link-13, /* Neocities */
+#social-link-14, /* YouTube */
+#social-link-15, /* Python3 */
+#social-link-16, /* OpenCV */
+#social-link-17, /* Flutter */
+#social-link-18, /* WebSockets */
+.social-link,
+.marquee-pill {}
+
+/* Code brackets (<span>, .tag-bracket). Text: "<" and "/>" */
+.tag-bracket {}
+
+/* Micro-icon (<span>, .tag-icon). */
+.tag-icon {}
+
+/* Tag label text (<span>, .tag-label). */
+.tag-label {}
+
+/* ── 4.8 Hero Quick Metric Highlights Bar ── */
+/* Highlights container row (<div>, #hero-quick-stats, .hero-quick-stats). */
+#hero-quick-stats,
+.hero-quick-stats {}
+
+/* Highlight box 1: ISIAT Rank 463 (<div>, #hero-stat-box-1, .hero-stat-box). */
+#hero-stat-box-1,
+.hero-stat-box {}
+#hero-stat-val-1,
+.hero-stat-val {} /* Text: "AIR 463" */
+#hero-stat-lbl-1,
+.hero-stat-lbl {} /* Text: "ISIAT Rank" */
+
+/* Highlight box 2: JEE Mains 2B Rank 963 (<div>, #hero-stat-box-2). */
+#hero-stat-box-2 {}
+#hero-stat-val-2 {} /* Text: "AIR 963" */
+#hero-stat-lbl-2 {} /* Text: "JEE Mains 2B" */
+
+/* Highlight box 3: NPTEL Top 2% (<div>, #hero-stat-box-3). */
+#hero-stat-box-3 {}
+#hero-stat-val-3 {} /* Text: "Top 2%" */
+#hero-stat-lbl-3 {} /* Text: "NPTEL Elite + Gold" */
+
+/* ── 4.9 Hero Scroll-Down Cue Indicator ── */
+/* Scroll cue container (<div>, #hero-scroll-indicator, .hero-scroll-indicator). */
+#hero-scroll-indicator,
+.hero-scroll-indicator {}
+
+/* Scroll anchor link (<a>, #hero-scroll-link, .hero-scroll-link). */
+#hero-scroll-link,
+.hero-scroll-link {}
+
+/* Animated scroll icon / down arrow (<span>, #hero-scroll-icon, .hero-scroll-icon). Text: "↓" */
+#hero-scroll-icon,
+.hero-scroll-icon {}
+
+/* Scroll prompt text (<span>, #hero-scroll-text, .hero-scroll-text). Text: "Scroll to explore" */
+#hero-scroll-text,
+.hero-scroll-text {}
+
+
+/* ── 5. MAIN CONTENT & GRID CONTAINER ── */
+/* Primary content wrapper (<main>, #main-content, .content-container). */
+#main-content,
+.content-container {}
+
+/* CSS Grid container holding all portfolio cards (<div>, #section-grid, .section-grid).
+   Pushes cards in single column or multi-column grid layout. */
+#section-grid,
+.section-grid {}
+
+
+/* ── 6. GENERIC SECTION CARDS & PATTERNS ── */
+/* Base section card container (<section>, .section-card).
+   Applied to Education, Test Scores, Hackathons, Certifications, Hiatus, Contact, Comment sections. */
+.section-card {}
+
+/* Primary section heading (<h2>, .section-title).
+   Styled with uppercase tracking, left accent bar, and Orbitron font. */
+.section-title {}
+
+/* Sub-section title for composite cards (<h3>, .composite-title). */
+.composite-title {}
+
+/* Entry row block container inside cards (<div>, .item-block). */
+.item-block {}
+
+/* Primary item title / institution name (<div>, .item-label). */
+.item-label {}
+
+/* Degree / exam score / certificate issuer detail (<div>, .item-detail). */
+.item-detail {}
+
+/* Date range / duration timestamp sub-text (<div>, .item-sub). */
+.item-sub {}
+
+/* Extended description paragraph (<p>, .item-desc). */
+.item-desc {}
+
+/* Special achievement highlight pill badge (<div>, .item-highlight). */
+.item-highlight {}
+
+/* Flex container for action buttons inside cards (<div>, .item-actions). */
+.item-actions {}
+
+/* Action button or external link (<a>, <button>, .action-btn). */
+.action-btn {}
+
+/* Two-column sub-grid container for test scores / compact items (<div>, .sub-grid). */
+.sub-grid {}
+
+/* Compact sub-grid cell item (<div>, .sub-item). */
+.sub-item {}
+
+
+/* ── 7. SPECIFIC DOM SECTIONS & SUB-SECTIONS (SKELETON) ── */
+
+/* ── 7.1 Education Section (Timeline Type) ──
+   Data Source: data.json -> sections[0] (id: "education") */
+#section-card-0, /* Education Section Card (<section>) */
+.section-card-education {}
+
+#section-title-0 {} /* Title: "Education" (<h2>) */
+
+/* Item 0: VIT Bhopal University */
+#item-block-0-0 {}  /* Container (<div>) */
+#item-label-0-0 {}  /* Label: "VIT Bhopal University" (<div>) */
+#item-detail-0-0 {} /* Detail: "Bachelor of Technology (Artificial Intelligence and Machine Learning)" (<div>) */
+#item-sub-0-0 {}    /* Period: "July 2024 To June 2028" (<div>) */
+
+/* Item 1: St. Xavier's School, Doranda, Ranchi */
+#item-block-0-1 {}  /* Container (<div>) */
+#item-label-0-1 {}  /* Label: "St. Xavier's School, Doranda, Ranchi" (<div>) */
+#item-detail-0-1 {} /* Detail: "Indian School Certificate, Science (ISC)" (<div>) */
+#item-sub-0-1 {}    /* Period: "2022 To 2024" (<div>) */
+#item-desc-0-1 {}   /* Desc: "Demonstrates strong academic foundation..." (<p>) */
+
+/* Item 2: Bishop's School, Ranchi */
+#item-block-0-2 {}  /* Container (<div>) */
+#item-label-0-2 {}  /* Label: "Bishop's School, Ranchi" (<div>) */
+#item-detail-0-2 {} /* Detail: "Indian Certificate of Secondary Education, Science (ICSE)" (<div>) */
+#item-sub-0-2 {}    /* Period: "2022" (<div>) */
+#item-desc-0-2 {}   /* Desc: "Proficiency in English, Hindi, Mathematics, Sciences..." (<p>) */
+
+
+/* ── 7.2 Test Scores & Rankings Section (Grid Type) ──
+   Data Source: data.json -> sections[1] (id: "test_scores") */
+#section-card-1 {} /* Test Scores Section Card (<section>) */
+#section-title-1 {} /* Title: "Test Scores & Rankings" (<h2>) */
+#sub-grid-1 {}      /* Sub-Grid Container (<div>) */
+
+#sub-item-1-0 {}       /* ISIAT Exam Container (<div>) */
+#sub-item-label-1-0 {} /* Label: "ISIAT (Indian Statistical Institute)" */
+#sub-item-detail-1-0 {}/* Score: "Rank 463" */
+
+#sub-item-1-1 {}       /* JEE Mains Paper 2B Container (<div>) */
+#sub-item-label-1-1 {} /* Label: "JEE mains (Paper 2B)" */
+#sub-item-detail-1-1 {}/* Score: "Rank 963" */
+
+#sub-item-1-2 {}       /* JEE Mains Paper 2A Container (<div>) */
+#sub-item-label-1-2 {} /* Label: "JEE mains (Paper 2A)" */
+#sub-item-detail-1-2 {}/* Score: "Rank 2240" */
+
+#sub-item-1-3 {}       /* JEE Mains Mathematics Container (<div>) */
+#sub-item-label-1-3 {} /* Label: "JEE mains (Mathematics)" */
+#sub-item-detail-1-3 {}/* Score: "97.893 (96.956%ile)" */
+
+#sub-item-1-4 {}       /* ISC Board Container (<div>) */
+#sub-item-label-1-4 {} /* Label: "ISC (CISCE)" */
+#sub-item-detail-1-4 {}/* Score: "301/400" */
+
+#sub-item-1-5 {}       /* ICSE Board Container (<div>) */
+#sub-item-label-1-5 {} /* Label: "ICSE (CISCE)" */
+#sub-item-detail-1-5 {}/* Score: "750/1000" */
+
+
+/* ── 7.3 Hackathons & Events Section (List Type) ──
+   Data Source: data.json -> sections[2] (id: "hackathons") */
+#section-card-2 {} /* Hackathons Section Card (<section>) */
+#section-title-2 {} /* Title: "Hackathons & Events" (<h2>) */
+
+#item-block-2-0 {}  /* EGC InnovateX Container (<div>) */
+#item-label-2-0 {}  /* Label: "EGC InnovateX Ideathon" */
+
+#item-block-2-1 {}  /* SolVIT Container (<div>) */
+#item-label-2-1 {}  /* Label: "SolVIT" */
+
+#item-block-2-2 {}  /* Flipkart Gridlock Container (<div>) */
+#item-label-2-2 {}  /* Label: "Flipkart Gridlock Hackathon 2.0" */
+
+#item-block-2-3 {}  /* CSI PromptX Container (<div>) */
+#item-label-2-3 {}  /* Label: "CSI PromptX" */
+
+
+/* ── 7.4 Recent Licenses & Certifications Section (Cards Type) ──
+   Data Source: data.json -> sections[3] (id: "certifications") */
+#section-card-3 {} /* Certifications Section Card (<section>) */
+#section-title-3 {} /* Title: "Recent Licenses & Certifications" (<h2>) */
+
+/* Item 0: Cloud Computing (IIT Kharagpur) */
+#card-item-3-0 {}          /* Container (<div>) */
+#card-item-label-3-0 {}    /* Title: "Cloud Computing (IIT Kharagpur)" */
+#card-item-detail-3-0 {}   /* Issuer: "NPTEL | May 2026" */
+#card-item-highlight-3-0 {}/* Highlight: "Top 2% (Elite + Gold)" */
+
+/* Item 1: Programming with Generative AI (IISc Bangalore) */
+#card-item-3-1 {}          /* Container (<div>) */
+#card-item-label-3-1 {}    /* Title: "Programming with Generative AI (IISc Bangalore)" */
+#card-item-detail-3-1 {}   /* Issuer: "NPTEL | Nov 2025" */
+#card-item-highlight-3-1 {}/* Highlight: "Top 5% (Elite + Silver)" */
+
+/* Item 2: HTML, CSS, and Javascript for Web Developers */
+#card-item-3-2 {}          /* Container (<div>) */
+#card-item-label-3-2 {}    /* Title: "HTML, CSS, and Javascript for Web Developers" */
+#card-item-detail-3-2 {}   /* Issuer: "The Johns Hopkins University | Feb 2026" */
+
+/* Item 3: MATLAB Onramp */
+#card-item-3-3 {}          /* Container (<div>) */
+#card-item-label-3-3 {}    /* Title: "MATLAB Onramp" */
+#card-item-detail-3-3 {}   /* Issuer: "MathWorks | Aug 19, 2024" */
+
+
+/* ── 7.5 Long On Hiatus Section (Composite Type) ──
+   Data Source: data.json -> sections[4] (id: "hiatus") */
+#section-card-4 {} /* Long On Hiatus Section Card (<section>) */
+#section-title-4 {} /* Title: "Long On Hiatus" (<h2>) */
+
+/* Composite Sub-Section 0: Achievements */
+#composite-title-4-0 {}   /* Sub-Title: "Achievements" (<h3>) */
+
+#composite-item-4-0-0 {}  /* Abacus Advance Level 4 Container (<div>) */
+#composite-label-4-0-0 {} /* Title: "Abacus Advance Level 4" */
+#composite-detail-4-0-0 {}/* Detail: "3rd in batch. Complex multiplication..." */
+
+#composite-item-4-0-1 {}  /* Rising star (Abacus) Container (<div>) */
+#composite-label-4-0-1 {} /* Title: "Rising star (Abacus)" */
+#composite-detail-4-0-1 {}/* Detail: "Mental arithmetic and concentration foundation." */
+
+#composite-item-4-0-2 {}  /* Rising Star (Fine Art) Container (<div>) */
+#composite-label-4-0-2 {} /* Title: "Rising Star (Fine Art)" */
+#composite-detail-4-0-2 {}/* Detail: "4th position in SIP 2017 mega competition." */
+
+#composite-item-4-0-3 {}  /* SOF- IMO Bronze Container (<div>) */
+#composite-label-4-0-3 {} /* Title: "SOF- IMO School lv. Bronze" */
+#composite-detail-4-0-3 {}/* Detail: "2018-19. Bronze at school level." */
+
+/* Composite Sub-Section 1: Certifications */
+#composite-title-4-1 {}   /* Sub-Title: "Certifications" (<h3>) */
+
+#composite-item-4-1-0 {}  /* SIP Abacus Grand Master Level A Container (<div>) */
+#composite-label-4-1-0 {} /* Title: "SIP Abacus Grand Master Level A" */
+#composite-detail-4-1-0 {}/* Detail: "Highest proficiency in SIP Abacus program." */
+
+#composite-item-4-1-1 {}  /* CHITRA BHUSHAN PART-2 Container (<div>) */
+#composite-label-4-1-1 {} /* Title: "CHITRA BHUSHAN PART-2" */
+#composite-detail-4-1-1 {}/* Detail: "1st Division with Distinction." */
+
+#composite-item-4-1-2 {}  /* CHITRA BHUSHAN PART-1 Container (<div>) */
+#composite-label-4-1-2 {} /* Title: "CHITRA BHUSHAN PART-1" */
+#composite-detail-4-1-2 {}/* Detail: "Diploma in Fine Arts (Painting)." */
+
+#composite-item-4-1-3 {}  /* PRARAMBHIK PART 2 Container (<div>) */
+#composite-label-4-1-3 {} /* Title: "PRARAMBHIK PART 2" */
+#composite-detail-4-1-3 {}/* Detail: "1st Division with Distinction." */
+
+#composite-item-4-1-4 {}  /* PRARAMBHIK PART 1 Container (<div>) */
+#composite-label-4-1-4 {} /* Title: "PRARAMBHIK PART 1" */
+#composite-detail-4-1-4 {}/* Detail: "1st Division." */
+
+
+/* ── 8. LIVE PLATFORM STATS COMPONENT ──
+   Prepend dynamically into #section-grid from /api/stats backend proxy */
+#stats-section,
+.stats-section {} /* Live Coding Stats Card (<section>) */
+
+#stats-title,
+.stats-title {} /* Section Title: "Live Coding Stats" (<h2>) */
+
+#stats-wrapper,
+.stats-wrapper {} /* Platform Cards Column Wrapper (<div>) */
+
+/* ── 8.1 LeetCode Statistics Block ── */
+#stats-block-leetcode,
+.stats-block {} /* LeetCode Outer Block (<div>) */
+
+#stats-label-leetcode {} /* Platform Label: "LeetCode" (<div>) */
+#stats-grid-leetcode {}  /* 3-Column Metrics Grid (<div>) */
+
+#stat-cell-leetcode-solved {} /* Metric 1 Cell: Solved Questions (<div>) */
+#stat-num-leetcode-solved {}  /* Solved Digit Value (<span>) */
+#stat-key-leetcode-solved {}  /* Label: "Solved" (<span>) */
+
+#stat-cell-leetcode-acc {}    /* Metric 2 Cell: Acceptance Rate (<div>) */
+#stat-num-leetcode-acc {}     /* Percentage Value (<span>) */
+#stat-key-leetcode-acc {}     /* Label: "Acceptance" (<span>) */
+
+#stat-cell-leetcode-rank {}   /* Metric 3 Cell: Ranking (<div>) */
+#stat-num-leetcode-rank {}    /* Global Rank Value (<span>) */
+#stat-key-leetcode-rank {}    /* Label: "Ranking" (<span>) */
+
+/* ── 8.2 GitHub Activity Block ── */
+#stats-block-github {} /* GitHub Outer Block (<div>) */
+
+#stats-label-github {} /* Platform Label: "GitHub Activity" (<div>) */
+#stats-grid-github {}  /* 3-Column Metrics Grid (<div>) */
+
+#stat-cell-github-repos {}     /* Metric 1 Cell: Public Repos (<div>) */
+#stat-num-github-repos {}      /* Repos Count Value (<span>) */
+#stat-key-github-repos {}      /* Label: "Repos" (<span>) */
+
+#stat-cell-github-followers {} /* Metric 2 Cell: Followers (<div>) */
+#stat-num-github-followers {}  /* Followers Count Value (<span>) */
+#stat-key-github-followers {}  /* Label: "Followers" (<span>) */
+
+#stat-cell-github-following {} /* Metric 3 Cell: Following (<div>) */
+#stat-num-github-following {}  /* Following Count Value (<span>) */
+#stat-key-github-following {}  /* Label: "Following" (<span>) */
+
+/* ── 8.3 Codeforces Block ── */
+#stats-block-codeforces {} /* Codeforces Outer Block (<div>) */
+
+#stats-label-codeforces {} /* Platform Label: "Codeforces" (<div>) */
+#stats-grid-codeforces {}  /* 3-Column Metrics Grid (<div>) */
+
+#stat-cell-codeforces-rating {}/* Metric 1 Cell: Current Rating (<div>) */
+#stat-num-codeforces-rating {} /* Rating Value (<span>) */
+#stat-key-codeforces-rating {} /* Label: "Rating" (<span>) */
+
+#stat-cell-codeforces-max {}   /* Metric 2 Cell: Max Rating (<div>) */
+#stat-num-codeforces-max {}    /* Max Rating Value (<span>) */
+#stat-key-codeforces-max {}    /* Label: "Max Rating" (<span>) */
+
+#stat-cell-codeforces-rank {}  /* Metric 3 Cell: Rank Rank Title (<div>) */
+#stat-num-codeforces-rank {}   /* Rank Title Value (<span>) */
+#stat-key-codeforces-rank {}   /* Label: "Rank" (<span>) */
+
+
+/* ── 9. CONTACT FORM COMPONENT ── */
+#contact-section,
+.contact-section {} /* Contact Section Container (<section>) */
+
+#contact-title {}   /* Section Title: "Contact & Inquiry" (<h2>) */
+
+#contact-form,
+.contact-form {}    /* Contact HTML Form (<form>) */
+
+/* Input Field Group 1: NAME */
+#contact-group-name,
+.form-group {}      /* Outer Group Wrapper (<div>) */
+#contact-label-name,
+.form-label {}      /* Field Label: "NAME" (<label for="contact-name">) */
+#contact-name,
+.form-input {}      /* Text Input (<input type="text">) */
+
+/* Input Field Group 2: EMAIL */
+#contact-group-email {}
+#contact-label-email {}
+#contact-email {}   /* Email Input (<input type="email">) */
+
+/* Input Field Group 3: SUBJECT */
+#contact-group-subject {}
+#contact-label-subject {}
+#contact-subject {} /* Subject Input (<input type="text">) */
+
+/* Input Field Group 4: BODY */
+#contact-group-body {}
+#contact-label-body {}
+#contact-body,
+.form-textarea {}  /* Body Textarea (<textarea rows="4">) */
+
+/* Form Action Button Wrapper */
+#contact-actions,
+.form-actions {}   /* Actions Container (<div>) */
+
+#contact-submit-btn,
+.contact-submit-btn,
+.action-btn {}     /* Submit Button (<button type="submit">) */
+
+/* Submission Status Message Box */
+#contact-status,
+.contact-status {} /* Feedback Text Container (<div>) */
+
+.status-success {} /* Success State: Green text message */
+.status-error {}   /* Error State: Red text message */
+.status-pending {} /* Pending State: Orange text message */
+
+
+/* ── 10. COMMENT FORM COMPONENT ── */
+#comment-section,
+.comment-section {} /* Comment Form Card (<section>) */
+
+#comment-title {}   /* Title: "Leave a Comment" (<h2>) */
+
+#comment-form,
+.comment-form {}    /* Comment HTML Form (<form>) */
+
+/* Input Field Group 1: NAME */
+#comment-group-name {}
+#comment-label-name {}
+#comment-name {}    /* Text Input (<input type="text">) */
+
+/* Input Field Group 2: POSITION WITH INSTITUTION */
+#comment-group-position {}
+#comment-label-position {}
+#comment-position {}/* Text Input (<input type="text">) */
+
+/* Input Field Group 3: GENDER */
+#comment-group-gender {}
+#comment-label-gender {}
+#comment-gender {}  /* Dropdown Select (<select>: Male, Female, Other) */
+
+/* Input Field Group 4: COMMENT TEXT */
+#comment-group-text {}
+#comment-label-text {}
+#comment-text {}    /* Comment Textarea (<textarea rows="4">) */
+
+/* Form Action Wrapper & Submit Button */
+#comment-actions {}
+#comment-submit-btn,
+.comment-submit-btn {} /* Submit Button (<button type="submit">) */
+
+#comment-status {}     /* Status Feedback Message (<div>) */
+
+
+/* ── 11. COMMENTS DISPLAY COMPONENT ── */
+#comments-display-section,
+.comments-display-section {} /* Comments Display Card (<section>) */
+
+#comments-display-title {}   /* Title: "What People Say" (<h2>) */
+
+#comments-display-status,
+.comments-display-status {}  /* Loading / Empty Message (<div>) */
+
+#comments-display-list,
+.comments-display-list {}    /* List Wrapper Holding Comment Cards (<div>) */
+
+/* Individual Comment Card Structure */
+#comment-card-0,
+.comment-card {}    /* Base Comment Card Container (<div>) */
+
+.comment-card-new {}/* Optimistically Prepended New Comment Card (<div>) */
+
+.comment-card-header {} /* Header Row Wrapper (<div>) */
+
+#comment-avatar-0,
+.comment-avatar {}  /* Circular Avatar Container (<div>) */
+
+#comment-avatar-img-0,
+.comment-avatar-img {} /* Gender SVG Avatar Image (<img>)
+                          Image Sources:
+                          - Male: src/image/boy.svg
+                          - Female: src/image/girl.svg
+                          - Other: src/image/other.svg */
+
+.comment-meta {}    /* Author Metadata Stack (<div>) */
+
+.comment-name {}    /* Comment Author Name (<div>) */
+
+.comment-position {}/* Position / Institution Sub-text (<div>) */
+
+.comment-body {}    /* Quoted Comment Text (<p>) */
+
+
+/* ── 12. NOSCRIPT & SECURITY OVERLAYS ── */
+#noscript-overlay,
+.noscript-overlay {}/* JavaScript Disabled Fullscreen Backdrop (<div>) */
+
+#noscript-title,
+.noscript-title {}  /* Warning Heading (<h1>) */
+
+#noscript-text,
+.noscript-text {}   /* Warning Paragraph (<p>) */
+
+
+/* ── 13. RESPONSIVE BREAKPOINTS ── */
+/* Mobile Screen Constraints (< 768px Viewports) */
+@media (max-width: 768px) {
+    #layout-wrapper {}
+    #section-grid {}
+    .stats-box-grid {}
+}

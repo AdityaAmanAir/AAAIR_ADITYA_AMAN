@@ -1,0 +1,6 @@
+build/
+server
+portfolio_server
+cert.pem
+key.pem
+.env

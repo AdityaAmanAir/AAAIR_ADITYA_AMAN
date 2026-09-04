@@ -1,0 +1,248 @@
+{
+    "metadata": {
+        "title": "Aditya Aman - Professional Portfolio Data",
+        "version": "2.2.0",
+        "last_updated": "2026-06-15"
+    },
+    "profile": {
+        "name": "ADITYA AMAN",
+        "birth_year": 2006,
+        "contact": {
+            "email": "AdityaAman@duck.com",
+            "phone": "+91 6203952143"
+        },
+        "social": [
+            {
+                "platform": "GitHub",
+                "url": "https://github.com/AdityaAmanAir"
+            },
+            {
+                "platform": "LinkedIn",
+                "url": "http://www.linkedin.com/in/adityaamanair"
+            },
+            {
+                "platform": "X",
+                "url": "https://x.com/AdityaAmanAir"
+            },
+            {
+                "platform": "Unstop",
+                "url": "https://unstop.com/u/AdityaAman"
+            },
+            {
+                "platform": "LeetCode",
+                "url": "https://leetcode.com/u/AdityaAmanAir/"
+            },
+            {
+                "platform": "CodeChef",
+                "url": "https://www.codechef.com/users/adityaamanair"
+            },
+            {
+                "platform": "Codeforces",
+                "url": "https://codeforces.com/profile/AdityaAmanAir"
+            },
+            {
+                "platform": "HackerRank",
+                "url": "https://www.hackerrank.com/profile/AdityaAmanAir"
+            },
+            {
+                "platform": "HackerEarth",
+                "url": "https://www.hackerearth.com/@AdityaAmanAir/"
+            },
+            {
+                "platform": "Neocities",
+                "url": "http://adityaaman.neocities.org/"
+            },
+            {
+                "platform": "YouTube",
+                "url": "http://www.youtube.com/@AdityaAmanAir"
+            }
+        ]
+    },
+    "sections": [
+        {
+            "id": "education",
+            "title": "Education",
+            "type": "timeline",
+            "data": [
+                {
+                    "institution": "VIT Bhopal University",
+                    "degree": "Bachelor of Technology (Artificial Intelligence and Machine Learning)",
+                    "period": "July 2024 To June 2028",
+                    "status": "Ongoing"
+                },
+                {
+                    "institution": "St. Xavier's School, Doranda, Ranchi",
+                    "degree": "Indian School Certificate, Science (ISC)",
+                    "period": "2022 To 2024",
+                    "date_of_issue": "May 5, 2024",
+                    "board": "The Council for the Indian School Certificate Examinations (CISCE)",
+                    "description": "Demonstrates strong academic foundation in core subjects including English Literature, Mathematics, Physics, Chemistry and Physical Education."
+                },
+                {
+                    "institution": "Bishop's School, Ranchi",
+                    "degree": "Indian Certificate of Secondary Education, Science (ICSE)",
+                    "period": "2022",
+                    "date_of_issue": "Jul 17, 2022",
+                    "board": "The Council for the Indian School Certificate Examinations (CISCE)",
+                    "description": "Proficiency in English, Hindi, Mathematics, Sciences, History, Geography and Java programming."
+                }
+            ]
+        },
+        {
+            "id": "test_scores",
+            "title": "Test Scores & Rankings",
+            "type": "grid",
+            "data": [
+                {
+                    "exam": "ISIAT (Indian Statistical Institute)",
+                    "score": "Rank 463",
+                    "date": "Jun 2024"
+                },
+                {
+                    "exam": "JEE mains (Paper 2B)",
+                    "score": "Rank 963",
+                    "date": "Jun 2024"
+                },
+                {
+                    "exam": "JEE mains (Paper 2A)",
+                    "score": "Rank 2240",
+                    "date": "Jun 2024"
+                },
+                {
+                    "exam": "JEE mains (Mathematics)",
+                    "score": "97.893 (96.956%ile)",
+                    "date": "Jan 2024"
+                },
+                {
+                    "exam": "ISC (CISCE)",
+                    "score": "301/400",
+                    "date": "2024"
+                },
+                {
+                    "exam": "ICSE (CISCE)",
+                    "score": "750/1000",
+                    "date": "Apr 2022"
+                }
+            ]
+        },
+        {
+            "id": "hackathons",
+            "title": "Hackathons & Events",
+            "type": "list",
+            "data": [
+                {
+                    "name": "EGC InnovateX Ideathon"
+                },
+                {
+                    "name": "SolVIT"
+                },
+                {
+                    "name": "Flipkart Gridlock Hackathon 2.0"
+                },
+                {
+                    "name": "CSI PromptX"
+                }
+            ]
+        },
+        {
+            "id": "certifications",
+            "title": "Recent Licenses & Certifications",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Cloud Computing (IIT Kharagpur)",
+                    "issuer": "NPTEL",
+                    "date": "May 2026",
+                    "id": "NPTEL26CS55S95240184",
+                    "highlight": "Top 2% (Elite + Gold)",
+                    "professor": "Prof. Soumya Kanti Ghosh"
+                },
+                {
+                    "title": "Programming with Generative AI (IISc Bangalore)",
+                    "issuer": "NPTEL",
+                    "date": "Nov 2025",
+                    "id": "NPTEL25CS137S1053200839",
+                    "highlight": "Top 5% (Elite + Silver)",
+                    "rank": 109,
+                    "professor": "Prof. Viraj Kumar"
+                },
+                {
+                    "title": "HTML, CSS, and Javascript for Web Developers",
+                    "issuer": "The Johns Hopkins University",
+                    "date": "Feb 2026",
+                    "id": "28XNML7796OB",
+                    "details": "Associated with AI and includes 4 internal certificates"
+                },
+                {
+                    "title": "MATLAB Onramp",
+                    "issuer": "MathWorks",
+                    "date": "Aug 19, 2024",
+                    "description": "Proficiency in MATLAB programming, data analysis, and numerical methods."
+                }
+            ]
+        },
+        {
+            "id": "hiatus",
+            "title": "Long On Hiatus",
+            "type": "composite",
+            "sub_sections": [
+                {
+                    "id": "achievements",
+                    "title": "Achievements",
+                    "data": [
+                        {
+                            "title": "Abacus Advance Level 4",
+                            "detail": "3rd in batch. Complex multiplication, division, and mental arithmetic."
+                        },
+                        {
+                            "title": "Rising star (Abacus)",
+                            "detail": "Mental arithmetic and concentration foundation."
+                        },
+                        {
+                            "title": "Rising Star (Fine Art)",
+                            "detail": "4th position in SIP 2017 mega competition."
+                        },
+                        {
+                            "title": "SOF- IMO School lv. Bronze",
+                            "detail": "2018-19. Bronze at school level."
+                        }
+                    ]
+                },
+                {
+                    "id": "hiatus_certs",
+                    "title": "Certifications",
+                    "data": [
+                        {
+                            "title": "SIP Abacus Grand Master Level A",
+                            "detail": "Highest proficiency in SIP Abacus program."
+                        },
+                        {
+                            "title": "CHITRA BHUSHAN PART-2",
+                            "issuer": "Pracheen Kala Kendra",
+                            "date": "Oct 28, 2019",
+                            "detail": "1st Division with Distinction."
+                        },
+                        {
+                            "title": "CHITRA BHUSHAN PART-1",
+                            "issuer": "Pracheen Kala Kendra",
+                            "date": "Oct 28, 2018",
+                            "detail": "Diploma in Fine Arts (Painting)."
+                        },
+                        {
+                            "title": "PRARAMBHIK PART 2",
+                            "issuer": "Pracheen Kala Kendra",
+                            "date": "Sep 29, 2017",
+                            "detail": "1st Division with Distinction."
+                        },
+                        {
+                            "title": "PRARAMBHIK PART 1",
+                            "issuer": "Pracheen Kala Kendra",
+                            "date": "Sep 29, 2016",
+                            "detail": "1st Division."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
