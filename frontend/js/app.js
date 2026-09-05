@@ -3,9 +3,11 @@ async function _0x1f2e() {
         const r = await fetch('/api/data');
         const d = await r.json();
         _0x3a4b(d);
-        const s = await fetch('/api/stats');
-        const st = await s.json();
-        _0x5c2d(st, d.profile.social);
+        _0x5c2d({}, d.profile.social);
+        fetch('/api/stats')
+            .then((response) => response.ok ? response.json() : Promise.reject(response.status))
+            .then((st) => _0x5c2d(st, d.profile.social))
+            .catch(() => _0x5c2d({ error: true }, d.profile.social));
         _0x7b8c();
         _0xCommentHandler();
         _0xLoadComments();
@@ -26,8 +28,7 @@ function _0x3a4b(d) {
             'X': `<svg class="brand-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
             'LeetCode': `<svg class="brand-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226a1.374 1.374 0 0 0-.416.947c0 .367.14.717.416.967l5.406 5.788c.25.25.6.39.961.39a1.374 1.374 0 0 0 .962-.39l5.406-5.788a1.374 1.374 0 0 0 0-1.914L14.445.438A1.374 1.374 0 0 0 13.483 0zm-8.88 9.467a1.374 1.374 0 0 0-.962.438L.416 13.131a1.374 1.374 0 0 0 0 1.914l3.225 3.226a1.374 1.374 0 0 0 1.963 0l3.225-3.226a1.374 1.374 0 0 0 0-1.914L5.604 9.905a1.374 1.374 0 0 0-1.001-.438z"/></svg>`,
             'YouTube': `<svg class="brand-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
-            'Linux': `🐧`,
-            'HackerEarth': `🌍`
+            'Linux': `🐧`
         };
         return logos[name] || '';
     };
@@ -49,7 +50,6 @@ function _0x3a4b(d) {
             { name: 'LeetCode', url: 'https://leetcode.com/u/AdityaAmanAir/' },
             { name: 'CodeChef', url: 'https://www.codechef.com/users/adityaamanair' },
             { name: 'Codeforces', url: 'https://codeforces.com/profile/AdityaAmanAir' },
-            { name: 'HackerRank', url: 'https://www.hackerrank.com/profile/AdityaAmanAir' },
             { name: 'C++20', url: '' },
             { name: 'PyTorch', url: '' },
             { name: 'Linux', url: '' }
@@ -58,7 +58,6 @@ function _0x3a4b(d) {
         const row2Data = [
             { name: 'X', url: 'https://x.com/AdityaAmanAir' },
             { name: 'Unstop', url: 'https://unstop.com/u/AdityaAman' },
-            { name: 'HackerEarth', url: 'https://www.hackerearth.com/@AdityaAmanAir/' },
             { name: 'Neocities', url: 'http://adityaaman.neocities.org/' },
             { name: 'YouTube', url: 'http://www.youtube.com/@AdityaAmanAir' },
             { name: 'Python3', url: '' },
@@ -257,29 +256,99 @@ function _0x5c2d(st, sc) {
     const grid = document.getElementById('section-grid');
     if (!grid) return;
 
+    const oldStatsCard = document.getElementById('stats-section');
+    if (oldStatsCard) oldStatsCard.remove();
+
     const statsCard = document.createElement('section');
     statsCard.className = 'section-card stats-section';
     statsCard.id = 'stats-section';
 
     let html = `<h2 id="stats-title" class="section-title">Live Coding Stats</h2><div id="stats-wrapper" class="stats-wrapper">`;
     const metrics = {
-        leetcode: [['totalSolved', 'Solved'], ['easySolved', 'Easy'], ['mediumSolved', 'Medium'], ['hardSolved', 'Hard'], ['ranking', 'Ranking'], ['contestRating', 'Contest Rating']],
+        leetcode: [['totalSolved', 'Solved'], ['easySolved', 'Easy'], ['mediumSolved', 'Medium'], ['hardSolved', 'Hard'], ['acceptanceRate', 'Acceptance'], ['ranking', 'Ranking']],
         github: [['publicRepos', 'Repos'], ['followers', 'Followers'], ['following', 'Following'], ['recentEvents', 'Recent Events']],
-        codeforces: [['rating', 'Rating'], ['maxRating', 'Max Rating'], ['contests', 'Contests'], ['submissions', 'Submissions'], ['rank', 'Rank']],
-        kaggle: [], hackerrank: [], hackerearth: []
+        codeforces: [['rating', 'Rating'], ['maxRating', 'Max Rating'], ['contests', 'Contests'], ['solved', 'Solved'], ['submissions', 'Submissions'], ['rank', 'Rank']],
+        codechef: [['rating', 'Rating'], ['solved', 'Solved'], ['contests', 'Contests']]
     };
+    if (!st || st.error || Object.keys(st).length === 0) {
+        ['GitHub', 'LeetCode', 'Codeforces', 'CodeChef'].forEach((platform) => {
+            html += `<div class="stats-block stats-loading-block"><div class="item-label">${platform}</div><div class="stats-box-grid">${Array.from({ length: 4 }, () => '<div class="stat-cell stat-skeleton"><span></span><span></span></div>').join('')}</div></div>`;
+        });
+    }
     Object.keys(metrics).forEach((platform) => {
-        const value = st[platform];
+        const value = st && st[platform];
         if (!value) return;
         const label = value.available ? value.platform : `${value.platform} (profile only)`;
         let cells = metrics[platform].filter(([key]) => value[key] !== undefined)
-            .map(([key, name]) => `<div class="stat-cell"><span class="stat-num">${value[key]}</span><span class="stat-key">${name}</span></div>`).join('');
+            .map(([key, name]) => `<div class="stat-cell"><span class="stat-num stat-count" data-value="${value[key]}" data-suffix="${key === 'acceptanceRate' ? '%' : ''}">0</span><span class="stat-key">${name}</span></div>`).join('');
         if (!value.available) cells = `<div class="stat-cell stat-unavailable"><span class="stat-num">-</span><span class="stat-key">Public API unavailable</span></div>`;
         html += `<div id="stats-block-${platform}" class="item-block stats-block"><a class="item-label stats-platform-link" href="${value.profile}" target="_blank" rel="noopener">${label}</a><div id="stats-grid-${platform}" class="stats-box-grid">${cells}</div></div>`;
     });
+    if (st && st.summary) {
+        html += `<div class="stats-summary"><div class="item-label">Verified totals</div><div class="summary-grid"><div class="summary-value"><strong class="stat-count" data-value="${st.summary.totalSolved}" data-suffix="+">0</strong><span>Problems solved</span></div><div class="summary-value"><strong class="stat-count" data-value="${st.summary.totalContests}" data-suffix="+">0</strong><span>Contests</span></div></div><small>Calculated from ${st.summary.sources.join(', ')}. Platforms without public data are excluded.</small></div>`;
+    }
+    ['leetcode', 'codeforces'].forEach((platform) => {
+        html += `<div class="platform-activity" id="${platform}-activity"><div class="item-label">${st[platform]?.platform || platform} Activity</div><div class="activity-calendar" id="${platform}-activity-calendar"><div class="activity-skeleton" aria-label="Loading activity"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></div></div>`;
+    });
+    html += `<div id="github-contribution-graph" class="github-contribution-graph">` +
+        `<a class="item-label stats-platform-link" href="https://github.com/AdityaAmanAir" target="_blank" rel="noopener">GitHub Contribution Graph</a>` +
+        `<div id="github-contribution-calendar" class="github-contribution-calendar"><div class="activity-skeleton" aria-label="Loading GitHub activity"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></div></div>` +
+        `</div>`;
     html += `</div>`;
     statsCard.innerHTML = html;
     grid.prepend(statsCard);
+    statsCard.querySelectorAll('.stat-count').forEach((counter) => {
+        const target = Number(counter.dataset.value) || 0;
+        const suffix = counter.dataset.suffix || '';
+        const started = performance.now();
+        const duration = 900;
+        const animate = (now) => {
+            const progress = Math.min((now - started) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const value = counter.dataset.suffix === '%' ? (target * eased).toFixed(1) : Math.round(target * eased);
+            counter.textContent = `${value}${suffix}`;
+            if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+    });
+    fetch('/api/github/contributions')
+        .then((response) => response.ok ? response.text() : Promise.reject(response.status))
+        .then((calendar) => {
+            const target = document.getElementById('github-contribution-calendar');
+            if (target) {
+                target.innerHTML = calendar;
+                target.querySelectorAll('.ContributionCalendar-day').forEach((cell) => {
+                    const date = cell.dataset.date || 'Unknown date';
+                    const level = cell.dataset.level || '0';
+                    cell.title = `${date}: GitHub contribution activity level ${level}`;
+                    cell.setAttribute('aria-label', cell.title);
+                });
+            }
+        })
+        .catch(() => {
+            const target = document.getElementById('github-contribution-calendar');
+            if (target) target.textContent = 'GitHub activity is temporarily unavailable.';
+        });
+    ['leetcode', 'codeforces'].forEach((platform) => {
+        fetch(`/api/activity/${platform}`)
+            .then((response) => response.ok ? response.json() : Promise.reject(response.status))
+            .then((activity) => {
+                const target = document.getElementById(`${platform}-activity-calendar`);
+                if (!target) return;
+                const values = Array.isArray(activity) ? activity : Object.entries(activity).map(([date, count]) => ({ date, count }));
+                const counts = new Map(values.map((entry) => [entry.date || new Date(Number(entry.timestamp) * 1000).toISOString().slice(0, 10), Number(entry.count || 0)]));
+                target.innerHTML = Array.from({ length: 371 }, (_, index) => {
+                    const date = new Date(Date.now() - (370 - index) * 86400000).toISOString().slice(0, 10);
+                    const count = counts.get(date) || 0;
+                    const level = count === 0 ? 0 : count < 2 ? 1 : count < 5 ? 2 : count < 10 ? 3 : 4;
+                    return `<span class="activity-day activity-level-${level}" title="${date}: ${count} submissions" aria-label="${date}: ${count} submissions"></span>`;
+                }).join('');
+            })
+            .catch(() => {
+                const target = document.getElementById(`${platform}-activity-calendar`);
+                if (target) target.textContent = 'Activity is temporarily unavailable.';
+            });
+    });
 }
 
 const _0x9e12 = "https://script.google.com/macros/s/AKfycbzkbvZEsIZLdeOcoxNywyMVpl1mV4pz-ihFdL8wYbnGNVzOH9Bwa6ipa36abDEjJu4Ftg/exec";

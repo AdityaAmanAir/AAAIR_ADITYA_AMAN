@@ -11,6 +11,7 @@ public:
     nlohmann::json getLeetCodeStats(const std::string& username) const;
     nlohmann::json getGitHubStats(const std::string& username) const;
     nlohmann::json getCodeforcesStats(const std::string& username) const;
+    nlohmann::json getCodeChefStats(const std::string& username) const;
     
     // Aggregate stats for the frontend
     nlohmann::json getAllStats(const nlohmann::json& handles) const;

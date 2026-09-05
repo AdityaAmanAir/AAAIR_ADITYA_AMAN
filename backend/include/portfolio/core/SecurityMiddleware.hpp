@@ -53,7 +53,7 @@ public:
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
             "style-src 'self' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' https://leetcode-stats-api.herokuapp.com https://github-readme-stats.vercel.app https://i.ibb.co data:; "
+            "img-src 'self' https://github-readme-stats.vercel.app https://i.ibb.co data:; "
             "connect-src 'self' https://script.google.com https://script.googleusercontent.com; "
             "frame-ancestors 'none'"
         );
