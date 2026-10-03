@@ -2,7 +2,7 @@
 
 This guide is for the current project version. The C++ server serves **HTTP on port 80**. HTTPS is not enabled by the current source code, so do not request a TLS certificate or expect `https://` to work with this build.
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` below with the repository's clone URL. These steps assume **Amazon Linux 2023** and the default `ec2-user` account.
+These steps assume **Amazon Linux 2023** and the default `ec2-user` account.
 
 ## 1. Create the EC2 instance
 
@@ -56,7 +56,7 @@ On Amazon Linux 2, use `cmake3` instead of `cmake` in the build commands below.
 
 ```bash
 cd ~
-git clone YOUR_GITHUB_REPOSITORY_URL AAAIR_ADITYA_AMAN
+git clone https://github.com/AdityaAmanAir/AAAIR_ADITYA_AMAN.git
 cd ~/AAAIR_ADITYA_AMAN
 cmake -S . -B build && cmake --build build --parallel 1
 ```
@@ -198,11 +198,11 @@ Value: YOUR_EC2_ELASTIC_IP
 Optionally add `www` as another `A` record to the same IP. Once DNS has propagated, test it from EC2:
 
 ```bash
-dig +short yourdomain.com
-dig +short www.yourdomain.com
+dig +short adityaman.website
+dig +short www.adityaman.website
 ```
 
-The returned address should be the EC2 Elastic IP. With the current HTTP-only application, visit `http://yourdomain.com/`.
+The returned address should be the EC2 Elastic IP. With the current HTTP-only application, visit `http://adityaman.website/`.
 
 ## HTTPS note
 
