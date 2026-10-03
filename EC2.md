@@ -23,21 +23,21 @@ For Amazon Linux 2023:
 
 ```bash
 sudo dnf update -y
-sudo dnf install -y git gcc-c++ cmake make
+sudo dnf install -y git gcc-c++ cmake make openssl-devel
 ```
 
 For Amazon Linux 2, use its `yum` packages and `cmake3` command:
 
 ```bash
 sudo yum update -y
-sudo yum install -y git gcc-c++ cmake3 make
+sudo yum install -y git gcc-c++ cmake3 make openssl-devel
 ```
 
 For Ubuntu:
 
 ```bash
 sudo apt update
-sudo apt install -y git build-essential cmake
+sudo apt install -y git build-essential cmake libssl-dev
 ```
 
 These provide Git to download the project, G++ to compile the C++ source, and CMake/Make to configure and run the build.
@@ -58,11 +58,12 @@ On Amazon Linux 2, use `cmake3` instead of `cmake` in the build commands below.
 cd ~
 git clone YOUR_GITHUB_REPOSITORY_URL AAAIR_ADITYA_AMAN
 cd ~/AAAIR_ADITYA_AMAN
-cmake -S . -B build
-cmake --build build --parallel 1
+cmake -S . -B build && cmake --build build --parallel 1
 ```
 
 A successful build ends with `Built target server`. The executable is `build/server`.
+
+The build requires OpenSSL development files. On Amazon Linux, these are provided by `openssl-devel`; on Ubuntu, install `libssl-dev`. If CMake reports that it cannot find `OPENSSL_CRYPTO_LIBRARY` or `OPENSSL_INCLUDE_DIR`, install the package for your operating system and rerun the build command. Configuration must succeed before CMake creates the build files, so a subsequent “No rule to make target 'Makefile'” error just means the build was attempted after configuration failed.
 
 If the repository is private, configure Git access on EC2 before cloning. Do not put passwords or access tokens directly into the clone URL or this document.
 
