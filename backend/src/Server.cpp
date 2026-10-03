@@ -12,7 +12,7 @@ Server::Server(const std::string& host, int port, const std::string& data_path)
     : host_(host), port_(port), data_path_(data_path),
       thread_count_(std::max(4u, std::thread::hardware_concurrency())) {}
 
-void Server::start() {
+bool Server::start() {
     // ── Dual-Stack (IPv4 & IPv6) Socket Configuration ──
     svr_.set_socket_options([](socket_t sock) {
         int opt = 1;
@@ -48,9 +48,16 @@ void Server::start() {
     svr_.set_mount_point("/", "./frontend");
     svr_.set_mount_point("/static", "./static");
 
-    std::cout << "[Server] Listening on http://" << host_ << ":" << port_ << " (threads: " << thread_count_ << ")" << std::endl;
+    if (!svr_.bind_to_port(host_, port_)) {
+        std::cerr << "[Server] Failed to bind http://" << host_ << ":" << port_ << std::endl;
+        if (port_ < 1024) {
+            std::cerr << "[Server] Ports below 1024 may require elevated privileges; try: sudo ./build/server" << std::endl;
+        }
+        return false;
+    }
 
-    svr_.listen(host_.c_str(), port_);
+    std::cout << "[Server] Listening on http://" << host_ << ":" << port_ << " (threads: " << thread_count_ << ")" << std::endl;
+    return svr_.listen_after_bind();
 }
 
 } // namespace core

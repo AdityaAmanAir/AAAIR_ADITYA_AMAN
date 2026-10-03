@@ -235,6 +235,92 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "personal-writing",
+            "title": "Personal Writing",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Sample: Why We Follow Social Norms",
+                    "issuer": "Personal Essay",
+                    "date": "Example",
+                    "highlight": "A short reflection on how group expectations shape everyday choices. Replace this sample with your post title and summary."
+                }
+            ]
+        },
+        {
+            "id": "science-and-technology",
+            "title": "Science & Technology",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Sample: Gradient Descent in One Dimension",
+                    "issuer": "Mathematics / AI",
+                    "date": "Example",
+                    "highlight": "A small worked example showing how repeated updates approach a function's minimum. Replace this sample with your article."
+                }
+            ]
+        },
+        {
+            "id": "timeline",
+            "title": "Timeline",
+            "type": "timeline",
+            "data": [
+                {
+                    "name": "Sample milestone: First portfolio release",
+                    "detail": "Published a personal site to collect projects and writing. Replace this sample with an event and a short detail.",
+                    "date": "Example year"
+                }
+            ]
+        },
+        {
+            "id": "resume",
+            "title": "Resume",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Aditya Aman",
+                    "highlight": "Read the resume as a webpage or download the HTML document.",
+                    "actions": [
+                        {
+                            "label": "Read Resume",
+                            "url": "/resume.html"
+                        },
+                        {
+                            "label": "Download Resume",
+                            "url": "/resume.html",
+                            "download": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "solutions",
+            "title": "Solutions",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Sample: Two Sum",
+                    "issuer": "Algorithms",
+                    "date": "Example",
+                    "highlight": "Given a list of numbers, find two that add to a target. Describe the approach, reasoning, and complexity here."
+                }
+            ]
+        },
+        {
+            "id": "art",
+            "title": "Art",
+            "type": "cards",
+            "data": [
+                {
+                    "title": "Bicycle Handlebar Stem",
+                    "issuer": "3D Model / FreeCAD",
+                    "model": "/src/3DModel/Bicycle%20Handlebar%20Stem%20model.glb",
+                    "highlight": "Designed in FreeCAD, this is a precision-modeled bicycle handlebar stem, the critical component that clamps the handlebars to the fork's steerer tube on a bike. More than just a connector, it serves as the vital link between the rider and the steering system, dramatically influencing how the bicycle handles. The design features smart weight-saving triangular ribs and a standard 4-bolt faceplate, which ensures even clamping pressure while striking a perfect balance between lightweight construction and structural stiffness. This makes a huge difference out on the road, as a well-engineered stem like this determines the rider's reach, posture, and aerodynamic profile, ultimately delivering the precise steering response and efficient power transfer needed for confident sprinting and climbing."
+                }
+            ]
         }
     ]
 }

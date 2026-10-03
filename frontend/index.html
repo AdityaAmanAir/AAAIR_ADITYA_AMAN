@@ -24,6 +24,15 @@
     <!-- Application Scripts -->
     <script id="script-security" src="/js/security.js"></script>
     <script id="script-app" src="/js/app.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script id="script-model-viewer" type="module" src="/js/model-viewer.js"></script>
     <script id="script-oneko" src="/js/oneko.js"></script>
     <noscript id="noscript-container">
         <div id="noscript-overlay" class="noscript-overlay">

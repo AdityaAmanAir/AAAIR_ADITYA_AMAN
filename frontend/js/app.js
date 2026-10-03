@@ -168,8 +168,9 @@ function _0x3a4b(d) {
                 `<div id="card-item-${sIdx}-${iIdx}" class="item-block">` +
                 `<div id="card-item-label-${sIdx}-${iIdx}" class="item-label">${i.title || i.name}</div>` +
                 `<div id="card-item-detail-${sIdx}-${iIdx}" class="item-detail">${i.issuer || ''} ${i.date ? '| ' + i.date : ''}</div>` +
+                `${i.model ? `<div id="model-viewer-${sIdx}-${iIdx}" class="model-viewer" data-model-url="${i.model}" data-model-title="${i.title || i.name || '3D model'}"><p class="model-viewer-status" role="status">Loading 3D model...</p></div>` : ''}` +
                 `${i.highlight ? `<div id="card-item-highlight-${sIdx}-${iIdx}" class="item-highlight">${i.highlight}</div>` : ''}` +
-                `${i.actions ? `<div id="card-item-actions-${sIdx}-${iIdx}" class="item-actions">${i.actions.map((v, aIdx) => `<a id="action-btn-${sIdx}-${iIdx}-${aIdx}" href="${v.url}" class="action-btn" target="_blank">${v.label}</a>`).join('')}</div>` : ''}` +
+                `${i.actions ? `<div id="card-item-actions-${sIdx}-${iIdx}" class="item-actions">${i.actions.map((v, aIdx) => `<a id="action-btn-${sIdx}-${iIdx}-${aIdx}" href="${v.url}" class="action-btn" ${v.download ? 'download' : 'target="_blank"'}>${v.label}</a>`).join('')}</div>` : ''}` +
                 `</div>`
             ).join('');
         } else if (s.type === 'composite') {

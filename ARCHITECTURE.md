@@ -131,6 +131,6 @@ The server will listen on `0.0.0.0:8080` (accessible via `http://localhost:8080`
 
 ## 6. Recommendations for Future Development
 
-- **Adding New Sections**: Add entries to `data.json` under `sections`. `app.js` will automatically render them with semantic IDs (`#section-card-${index}`).
+- **Adding Portfolio Content**: Add entries to `data.json` under `sections`. The existing `timeline` and `cards` types cover milestones, writing, solutions, resume links, and artwork; `app.js` renders them with semantic IDs (`#section-card-${index}`). Put standalone documents such as the resume in `frontend/` and link to them from the data. Set an action's `download` value to `true` to make its link download the file.
 - **Adding Custom Styling Elements**: Use CSS pseudo-elements (`::before`, `::after`) inside theme stylesheets to create divider lines, accent borders, or bullet icons without cluttering the DOM.
 - **HTTPS Enablement**: If deploying over public networks, update `backend/src/main.cpp` to use `httplib::SSLServer`.

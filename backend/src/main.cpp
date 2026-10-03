@@ -39,13 +39,13 @@ int main() {
 
     std::cout << "[Main] Initializing Generic Backend..." << std::endl;
 
-    // HTTP Server thread
+    bool server_started = false;
     std::thread http_thread([&]() {
         portfolio::core::Server http_server(host, 80, data_path);
-        http_server.start();
+        server_started = http_server.start();
     });
 
     http_thread.join();
 
-    return 0;
+    return server_started ? 0 : 1;
 }

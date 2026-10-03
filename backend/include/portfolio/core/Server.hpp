@@ -11,7 +11,7 @@ namespace core {
 class Server {
 public:
     Server(const std::string& host, int port, const std::string& data_path);
-    void start();
+    bool start();
 
 private:
     std::string host_;
