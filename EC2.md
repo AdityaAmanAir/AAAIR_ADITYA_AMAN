@@ -207,3 +207,105 @@ The returned address should be the EC2 Elastic IP. With the current HTTP-only ap
 ## HTTPS note
 
 The current `backend/src/main.cpp` starts a plain HTTP server on port 80, and the current `CMakeLists.txt` does not enable TLS. A certificate alone does not make this program speak HTTPS. HTTPS requires changing the server implementation and build configuration to use TLS, or deploying a separate TLS endpoint. Do not run Certbot's standalone HTTP challenge while this server is occupying port 80; stop the service first if using that challenge after HTTPS support is configured.
+
+## Local AI backend (Gemma)
+
+This section supplements the deployment steps above. The AI backend is a local `llama.cpp` process, not Google's hosted Gemini API. It runs Google Gemma 3 1B Instruct QAT (`IQ4_XS` GGUF) on the EC2 instance. No Gemini API key is required.
+
+### Instance requirements and ports
+
+- Use an x86_64 instance; `AI_backend/start-model.sh` downloads the pinned Ubuntu x64 llama.cpp runtime. The bundled runtime is not for Graviton/ARM instances.
+- Use an x86_64 instance with at least 4 GiB of RAM; 8 GiB is preferable if other services run on the instance. The model file is about 681 MiB and uses a 1024-token context. Instances with 1-2 GiB of RAM may rely heavily on swap and respond slowly; a t3.nano is not suitable.
+- Keep the EC2 security group open for SSH on port 22 and the website on port 80 only. The model binds to `127.0.0.1:8081`; do not expose port 8081 publicly.
+- The first model start downloads the model and llama.cpp runtime. The script verifies pinned SHA-256 checksums before launching. Subsequent starts reuse those files.
+
+Check the instance architecture and memory before continuing:
+
+```bash
+uname -m
+free -h
+```
+
+`uname -m` should print `x86_64`. If it prints `aarch64`, the current start script's prebuilt runtime will not run; build llama.cpp for that architecture and update the script before enabling the service.
+
+### Install the model service
+
+The model service runs as `ec2-user`, downloads missing files into the repository, and restarts if llama.cpp exits:
+
+```bash
+sudo tee /etc/systemd/system/portfolio-ai.service > /dev/null <<'EOF'
+[Unit]
+Description=Local Gemma model for portfolio chat
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/AAAIR_ADITYA_AMAN
+ExecStart=/home/ec2-user/AAAIR_ADITYA_AMAN/AI_backend/start-model.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+The model binds only to loopback at `127.0.0.1:8081`. Its chat endpoint is `POST /v1/chat/completions`; it is an internal service called by the portfolio backend, not a public website endpoint.
+
+### Start services in dependency order
+
+The portfolio service must wait until the model health endpoint responds. Add a systemd drop-in without replacing the existing `portfolio.service`:
+
+```bash
+sudo mkdir -p /etc/systemd/system/portfolio.service.d
+sudo tee /etc/systemd/system/portfolio.service.d/ai.conf > /dev/null <<'EOF'
+[Unit]
+Requires=portfolio-ai.service
+After=portfolio-ai.service
+
+[Service]
+TimeoutStartSec=20min
+ExecStartPre=/usr/bin/bash -lc 'for attempt in {1..600}; do /usr/bin/curl -fsS http://127.0.0.1:8081/health >/dev/null && exit 0; /usr/bin/sleep 2; done; exit 1'
+EOF
+```
+
+Enable both services and start them. The readiness check lets the model finish its first download and load before the website backend starts:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now portfolio-ai
+sudo systemctl enable --now portfolio
+sudo systemctl restart portfolio
+```
+
+Check model health, service state, and logs:
+
+```bash
+curl -fsS http://127.0.0.1:8081/health
+sudo systemctl status portfolio-ai portfolio
+sudo journalctl -u portfolio-ai -n 100 --no-pager
+sudo journalctl -u portfolio -n 100 --no-pager
+```
+
+The health response should be `{"status":"ok"}`. Test the public site at `http://YOUR_EC2_PUBLIC_IP/`. The model service is not reachable from outside the instance.
+
+### AI request privacy
+
+The AI chat endpoint receives only the current question. It does not read `data.json`, use portfolio details, or receive earlier chat messages. The browser replaces the displayed exchange whenever a new question is submitted. No transcript history is sent to the AI, and no `portfolio_context.json` snapshot is created. Normal portfolio APIs continue using `data.json` independently of the AI route.
+
+### Updating the AI runtime
+
+After pulling a change to the model launcher or AI backend, rebuild the C++ server if its source changed, then restart the model and website services:
+
+```bash
+cd ~/AAAIR_ADITYA_AMAN
+git pull
+cmake -S . -B build
+cmake --build build --parallel 1
+sudo systemctl restart portfolio-ai
+sudo systemctl restart portfolio
+```
+
+If the model URL, checksum, or llama.cpp runtime changes, inspect `AI_backend/start-model.sh` and verify the new artifacts before restarting. Gemma's weights are subject to Google's Gemma Terms of Use.

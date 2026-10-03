@@ -4,3 +4,5 @@ portfolio_server
 cert.pem
 key.pem
 .env
+/AI_backend/*.gguf
+/AI_backend/runtime/

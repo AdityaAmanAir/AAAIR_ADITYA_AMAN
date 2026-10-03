@@ -1,7 +1,12 @@
 #include <portfolio/controller/ApiController.hpp>
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <ctime>
 #include <map>
+#include <set>
+#include <sstream>
+#include <vector>
 
 namespace portfolio {
 namespace controller {
@@ -22,6 +27,118 @@ void ApiController::setCorsHeaders(const httplib::Request& req, httplib::Respons
     // Integrity Headers
     res.set_header("X-Content-Type-Options", "nosniff");
     res.set_header("X-Frame-Options", "DENY");
+}
+
+static std::string getRelevantPortfolioData(const nlohmann::json& data, const std::string& question) {
+    const auto profile = data.value("profile", nlohmann::json::object());
+    std::string profileContext = "Name: " + profile.value("name", std::string("Unknown"));
+    const int birthYear = profile.value("birth_year", 0);
+    if (birthYear > 0) profileContext += ". Birth year: " + std::to_string(birthYear);
+
+    std::set<std::string> queryWords;
+    static const std::set<std::string> ignoredWords = {
+        "what", "who", "when", "where", "why", "how", "is", "are", "was", "were",
+        "the", "and", "for", "with", "from", "about", "this", "that", "name",
+        "tell", "please", "can", "could", "would", "you", "your", "me", "my", "his", "her",
+        "answer", "one", "word", "listed", "did", "does"
+    };
+    std::istringstream questionStream(question);
+    std::string word;
+    while (questionStream >> word) {
+        for (char& character : word) {
+            character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+            if (!std::isalnum(static_cast<unsigned char>(character))) character = ' ';
+        }
+        std::istringstream wordStream(word);
+        std::string token;
+        while (wordStream >> token) {
+            if (token.size() >= 3 && ignoredWords.count(token) == 0) queryWords.insert(token);
+        }
+    }
+
+    std::vector<std::pair<int, nlohmann::json>> rankedSections;
+    const auto sections = data.value("sections", nlohmann::json::array());
+    if (sections.is_array()) {
+        for (const auto& section : sections) {
+            std::string searchable = section.dump();
+            std::transform(searchable.begin(), searchable.end(), searchable.begin(), [](unsigned char character) {
+                return static_cast<char>(std::tolower(character));
+            });
+            int score = 0;
+            for (const auto& token : queryWords) {
+                if (searchable.find(token) != std::string::npos) ++score;
+            }
+            if (score > 0) rankedSections.emplace_back(score, section);
+        }
+    }
+
+    std::sort(rankedSections.begin(), rankedSections.end(), [](const auto& left, const auto& right) {
+        return left.first > right.first;
+    });
+
+    const auto appendEntry = [](std::string& output, const nlohmann::json& entry) {
+        static const std::vector<std::string> fields = {
+            "institution", "degree", "period", "name", "title", "detail",
+            "description", "exam", "score", "issuer", "date", "year",
+            "highlight", "level"
+        };
+        bool hasFacts = false;
+        for (const auto& field : fields) {
+            if (!entry.contains(field) || (!entry[field].is_string() && !entry[field].is_number())) continue;
+            const std::string value = entry[field].is_string() ? entry[field].get<std::string>() : entry[field].dump();
+            if (value.empty()) continue;
+            if (!hasFacts) output += "- ";
+            std::string label = field;
+            std::replace(label.begin(), label.end(), '_', ' ');
+            output += label + ": " + value + "; ";
+            hasFacts = true;
+        }
+        if (hasFacts) output += "\n";
+    };
+
+    std::string normalizedQuestion = question;
+    std::transform(normalizedQuestion.begin(), normalizedQuestion.end(), normalizedQuestion.begin(), [](unsigned char character) {
+        return static_cast<char>(std::tolower(character));
+    });
+    static const std::vector<std::string> profileTerms = {
+        "name", "aditya", "age", "born", "birth", "contact", "email", "phone", "who is he", "who am i"
+    };
+    const bool asksAboutProfile = std::any_of(profileTerms.begin(), profileTerms.end(), [&](const std::string& term) {
+        return normalizedQuestion.find(term) != std::string::npos;
+    });
+    std::string context = rankedSections.empty() && asksAboutProfile ? profileContext : std::string{};
+    const size_t maxContextSize = 200;
+    int selectedSections = 0;
+    for (const auto& ranked : rankedSections) {
+            if (selectedSections == 1 || context.size() >= maxContextSize) break;
+        std::string section = "Section: " + ranked.second.value("title", std::string("Untitled")) + "\n";
+        const auto entries = ranked.second.value("data", nlohmann::json::array());
+        if (entries.is_array()) {
+            for (const auto& entry : entries) appendEntry(section, entry);
+        }
+        const auto subsections = ranked.second.value("sub_sections", nlohmann::json::array());
+        if (subsections.is_array()) {
+            for (const auto& subsection : subsections) {
+                section += "Subsection: " + subsection.value("title", std::string("Untitled")) + "\n";
+                const auto subsectionEntries = subsection.value("data", nlohmann::json::array());
+                if (subsectionEntries.is_array()) {
+                    for (const auto& entry : subsectionEntries) appendEntry(section, entry);
+                }
+            }
+        }
+        const size_t available = maxContextSize - context.size();
+        if (section.size() > available) {
+            size_t end = available;
+            while (end > 0 && end < section.size() &&
+                   (static_cast<unsigned char>(section[end]) & 0xC0) == 0x80) {
+                --end;
+            }
+            section.resize(end);
+        }
+        context += "\n" + section;
+        ++selectedSections;
+    }
+    return context;
 }
 
 bool isAuthorized(const httplib::Request& req) {
@@ -54,7 +171,6 @@ static bool sendPayloadToScript(const std::string& url, const std::string& jsonS
 void ApiController::registerRoutes(httplib::Server& svr) const {
     svr.Get("/api/activity/:platform", [](const httplib::Request& req, httplib::Response& res) {
         const auto platform = req.path_params.at("platform");
-        const std::string username = "AdityaAmanAir";
         httplib::Client client(platform == "leetcode" ? "https://leetcode.com" : "https://codeforces.com");
         client.set_connection_timeout(5);
         client.set_read_timeout(10);
@@ -81,8 +197,8 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
                     output = nlohmann::json::array();
                 }
             }
-        } else if (platform == "codeforces") {
-            auto response = client.Get("/api/user.status?handle=" + username + "&from=1&count=10000");
+        } else {
+            auto response = client.Get("/api/user/info?handle=AdityaAmanAir");
             if (response && response->status == 200) {
                 try {
                     auto data = nlohmann::json::parse(response->body);
@@ -127,6 +243,7 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             res.set_content("GitHub contribution graph unavailable", "text/plain");
             return;
         }
+
         const auto table_start = graph->body.find("<table");
         const auto table_end = graph->body.find("</table>", table_start);
         if (table_start == std::string::npos || table_end == std::string::npos) {
@@ -134,18 +251,17 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             res.set_content("GitHub contribution graph unavailable", "text/plain");
             return;
         }
+
         res.set_content(graph->body.substr(table_start, table_end - table_start + 8), "text/html");
         res.set_header("Cache-Control", "public, max-age=900");
     });
 
-    // ── OPTIONS preflight handler ──
     svr.Options("/api/(.*)", [](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
         res.status = 204;
     });
 
-    // ── Get All Data (The Full Dataset) ──
-    svr.Get("/api/data", [&](const httplib::Request& req, httplib::Response& res) {
+    svr.Get("/api/data", [this](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
         if (!isAuthorized(req)) {
             res.status = 403;
@@ -155,20 +271,18 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
         res.set_content(dataService_.getData().dump(), "application/json");
     });
 
-    // ── Get Live Coding Stats ──
-    svr.Get("/api/stats", [&](const httplib::Request& req, httplib::Response& res) {
+    svr.Get("/api/stats", [this](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
-        
+
         auto fullData = dataService_.getData();
         nlohmann::json handles = nlohmann::json::object();
-        
-        // Extract handles from social links in data.json
+
         if (fullData.contains("profile") && fullData["profile"].contains("social")) {
             for (const auto& s : fullData["profile"]["social"]) {
                 std::string platform = s.value("platform", "");
                 std::string url = s.value("url", "");
                 if (platform.empty() || url.empty()) continue;
-                
+
                 while (!url.empty() && url.back() == '/') url.pop_back();
                 const auto slash = url.find_last_of('/');
                 std::string username = slash == std::string::npos ? url : url.substr(slash + 1);
@@ -176,18 +290,18 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
                 handles[platform] = username;
             }
         }
-        
+
         res.set_content(statsService_.getAllStats(handles).dump(), "application/json");
     });
 
-    // ── Get Specific Section ──
-    svr.Get("/api/section/:id", [&](const httplib::Request& req, httplib::Response& res) {
+    svr.Get("/api/section/:id", [this](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
         if (!isAuthorized(req)) {
             res.status = 403;
             res.set_content("{\"error\":\"Forbidden\"}", "application/json");
             return;
         }
+
         auto id = req.path_params.at("id");
         auto section = dataService_.getSection(id);
         if (section.empty()) {
@@ -198,7 +312,54 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
         }
     });
 
-    // ── Contact / Inquiry Proxy Handler ──
+    svr.Post("/api/ai/chat", [this](const httplib::Request& req, httplib::Response& res) {
+        setCorsHeaders(req, res);
+        try {
+            const auto body = nlohmann::json::parse(req.body);
+            const std::string question = body.value("question", std::string{});
+            if (question.find_first_not_of(" \t\r\n") == std::string::npos || question.size() > 500) {
+                res.status = 400;
+                res.set_content("{\"error\":\"Enter a question up to 500 characters.\"}", "application/json");
+                return;
+            }
+
+            const std::string context = getRelevantPortfolioData(dataService_.getData(), question);
+            const std::string prompt = context.empty()
+                ? question
+                : "Site facts: " + context + "\nQuestion: " + question + "\nAnswer briefly.";
+            nlohmann::json requestBody = {
+                {"model", "google_gemma-3-1b-it-qat-IQ4_XS"},
+                {"messages", nlohmann::json::array({
+                    {{"role", "user"}, {"content", prompt}}
+                })},
+                {"temperature", 0.2},
+                {"max_tokens", 96},
+                {"stream", false}
+            };
+
+            httplib::Client modelClient("127.0.0.1", 8081);
+            modelClient.set_connection_timeout(2);
+            modelClient.set_read_timeout(120);
+            const auto modelResponse = modelClient.Post("/v1/chat/completions", requestBody.dump(), "application/json");
+            if (!modelResponse || modelResponse->status != 200) {
+                res.status = 503;
+                res.set_content("{\"error\":\"The local AI model is unavailable.\"}", "application/json");
+                return;
+            }
+
+            const auto answerData = nlohmann::json::parse(modelResponse->body);
+            const std::string answer = answerData.at("choices").at(0).at("message").at("content").get<std::string>();
+            if (answer.find_first_not_of(" \t\r\n") == std::string::npos) {
+                res.set_content(nlohmann::json{{"answer", "I couldn't generate a reply. Please rephrase and try again."}}.dump(), "application/json");
+                return;
+            }
+            res.set_content(nlohmann::json{{"answer", answer}}.dump(), "application/json");
+        } catch (const std::exception&) {
+            res.status = 400;
+            res.set_content("{\"error\":\"Invalid chat request.\"}", "application/json");
+        }
+    });
+
     svr.Post("/api/contact", [](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
         try {
@@ -210,7 +371,6 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             std::string bodyText = bodyJson.value("BODY", bodyJson.value("body", ""));
 
             std::string scriptUrl = "https://script.google.com/macros/s/AKfycbzkbvZEsIZLdeOcoxNywyMVpl1mV4pz-ihFdL8wYbnGNVzOH9Bwa6ipa36abDEjJu4Ftg/exec";
-            
             nlohmann::json payload;
             payload["NAME"] = name;
             payload["EMAIL"] = email;
@@ -219,15 +379,13 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             payload["BODY"] = bodyText;
 
             sendPayloadToScript(scriptUrl, payload.dump());
-
             res.set_content("{\"status\":\"success\", \"message\":\"Query forwarded successfully\"}", "application/json");
-        } catch (const std::exception& e) {
+        } catch (const std::exception&) {
             res.status = 400;
             res.set_content("{\"error\":\"Invalid request body\"}", "application/json");
         }
     });
 
-    // ── Comment Proxy Handler ──
     svr.Post("/api/comment", [](const httplib::Request& req, httplib::Response& res) {
         setCorsHeaders(req, res);
         try {
@@ -238,7 +396,6 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             std::string comment = bodyJson.value("Comment", bodyJson.value("COMMENT", bodyJson.value("comment", "")));
 
             std::string scriptUrl = "https://script.google.com/macros/s/AKfycbzb9XEjjUmMhJw2I9CXIDCfsuB-mmkq_T4dUGNx9xCiysDnFQCrs-U9s6uea8nJqKLF-g/exec";
-
             nlohmann::json payload;
             payload["NAME"] = name;
             payload["Position With Institution"] = position;
@@ -249,14 +406,12 @@ void ApiController::registerRoutes(httplib::Server& svr) const {
             payload["COMMENT"] = comment;
 
             sendPayloadToScript(scriptUrl, payload.dump());
-
             res.set_content("{\"status\":\"success\", \"message\":\"Comment forwarded successfully\"}", "application/json");
-        } catch (const std::exception& e) {
+        } catch (const std::exception&) {
             res.status = 400;
             res.set_content("{\"error\":\"Invalid request body\"}", "application/json");
         }
     });
-
 }
 
 } // namespace controller

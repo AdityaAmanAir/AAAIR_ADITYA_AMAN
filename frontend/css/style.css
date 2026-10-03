@@ -739,6 +739,28 @@ a {
     pointer-events: none;
 }
 
+.ai-chat-answer {
+    min-height: 1.65em;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+}
+
+.ai-chat-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px;
+}
+
+.ai-chat-form .form-label {
+    flex-basis: 100%;
+}
+
+.ai-chat-form .form-input {
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
 .action-btn {
     display: inline-flex;
     align-items: center;

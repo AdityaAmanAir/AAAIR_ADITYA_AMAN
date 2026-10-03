@@ -247,10 +247,68 @@ function _0x3a4b(d) {
         `<h2 id="comments-display-title" class="section-title">What People Say</h2>` +
         `<div id="comments-display-status" class="comments-display-status">Loading comments...</div>` +
         `<div id="comments-display-list" class="comments-display-list"></div>` +
+        `</section>` +
+        `<section id="ai-chat-section" class="section-card ai-chat-section">` +
+        `<h2 id="ai-chat-title" class="section-title">Ask About This Portfolio</h2>` +
+        `<div id="ai-chat-transcript" class="ai-chat-transcript" role="log" aria-live="polite" aria-relevant="additions">` +
+        `<p class="ai-chat-message ai-chat-message-assistant">Portfolio bot: Ask me about the information on this site.</p>` +
+        `</div>` +
+        `<form id="ai-chat-form" class="ai-chat-form">` +
+        `<label class="form-label" for="ai-chat-question">Your question</label>` +
+        `<input id="ai-chat-question" class="form-input" type="text" maxlength="500" required placeholder="Ask a question">` +
+        `<button id="ai-chat-submit" class="action-btn" type="submit">Ask</button>` +
+        `</form>` +
         `</section>`;
 
     sectionsHtml += `</div>`;
     m.innerHTML = sectionsHtml;
+
+    const chatForm = document.getElementById('ai-chat-form');
+    const chatQuestion = document.getElementById('ai-chat-question');
+    const chatTranscript = document.getElementById('ai-chat-transcript');
+    const chatSubmit = document.getElementById('ai-chat-submit');
+    const conversation = [];
+    const addChatMessage = (role, content) => {
+        const message = document.createElement('p');
+        message.className = `ai-chat-message ai-chat-message-${role}`;
+        message.textContent = `${role === 'user' ? 'You' : 'Portfolio bot'}: ${content}`;
+        chatTranscript.append(message);
+        chatTranscript.scrollTop = chatTranscript.scrollHeight;
+        return message;
+    };
+
+    chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const question = chatQuestion.value.trim();
+        if (!question) return;
+
+        const history = conversation.slice(-4);
+        addChatMessage('user', question);
+        const pendingMessage = addChatMessage('assistant', 'Thinking...');
+        chatQuestion.value = '';
+        chatQuestion.disabled = true;
+        chatSubmit.disabled = true;
+        try {
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, history })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'The question could not be answered.');
+            const answer = typeof result.answer === 'string' ? result.answer.trim() : '';
+            if (!answer) throw new Error('The AI returned an empty reply. Try a shorter question.');
+            pendingMessage.textContent = `Portfolio bot: ${answer}`;
+            conversation.push({ role: 'user', content: question }, { role: 'assistant', content: answer });
+            if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
+        } catch (error) {
+            pendingMessage.textContent = `Portfolio bot: ${error.message || 'The AI model is unavailable.'}`;
+        } finally {
+            chatQuestion.disabled = false;
+            chatSubmit.disabled = false;
+            chatQuestion.focus();
+        }
+    });
 }
 
 function _0x5c2d(st, sc) {

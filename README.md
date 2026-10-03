@@ -41,7 +41,8 @@ Start the server from the project root:
 ./build/server
 ```
 
-The server listens on `http://localhost:80`. Port 80 may require administrator privileges:
+The server listens on `http://localhost:80`. Port 80 may require administrator
+privileges:
 
 ```bash
 sudo ./build/server
