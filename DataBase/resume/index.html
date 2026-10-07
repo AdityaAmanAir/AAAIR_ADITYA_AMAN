@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume | Aditya Aman</title>
+    <link rel="stylesheet" href="viewer.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="home-link" href="/">Aditya Aman</a>
+        <h1 id="document-title">Resume</h1>
+        <nav class="actions" aria-label="Document actions">
+            <a class="button button-secondary" id="open-file" target="_blank" rel="noopener" hidden>Open file</a>
+            <a class="button button-primary" id="download-file" href="#" hidden>Download</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="filebar" id="filebar" hidden>
+            <span class="pdf-label" id="file-type"></span>
+            <span id="file-name"></span>
+        </div>
+        <p class="file-status" id="file-status" role="status" aria-live="polite" hidden></p>
+        <p class="download-status" id="download-status" role="status" aria-live="polite"></p>
+        <section class="preview" id="preview" aria-label="Resume preview" hidden>
+            <iframe id="pdf-preview" title="PDF preview" hidden></iframe>
+            <article id="docx-preview" class="docx-preview" hidden></article>
+        </section>
+    </main>
+
+    <script>
+        const parameters = new URLSearchParams(window.location.search);
+        const fileName = parameters.get('file');
+        const extension = fileName ? fileName.split('.').pop().toLowerCase() : '';
+        const validFileName = fileName && !fileName.includes('/') && !fileName.includes('\\') &&
+            (extension === 'pdf' || extension === 'docx');
+        const fileStatus = document.getElementById('file-status');
+
+        if (validFileName) {
+            const encodedFileName = encodeURIComponent(fileName);
+            const fileUrl = `/resume/${encodedFileName}`;
+            const downloadUrl = `/resume/download?file=${encodedFileName}`;
+            const title = fileName.replace(/\.(pdf|docx)$/i, '');
+
+            document.title = `${title} | Resume`;
+            document.getElementById('document-title').textContent = title;
+            document.getElementById('file-name').textContent = fileName;
+            document.getElementById('file-type').textContent = extension.toUpperCase();
+            document.getElementById('open-file').href = fileUrl;
+            document.getElementById('download-file').addEventListener('click', event => {
+                event.preventDefault();
+                downloadDocument(downloadUrl);
+            });
+            document.getElementById('filebar').hidden = false;
+            document.getElementById('preview').hidden = false;
+            document.getElementById('open-file').hidden = false;
+            document.getElementById('download-file').hidden = false;
+            if (extension === 'pdf') {
+                const pdfPreview = document.getElementById('pdf-preview');
+                pdfPreview.title = `Preview of ${fileName}`;
+                pdfPreview.hidden = false;
+                fetch(fileUrl, { method: 'HEAD' })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`File request failed (${response.status}).`);
+                        pdfPreview.src = `${fileUrl}#toolbar=0&navpanes=0&view=FitH`;
+                    })
+                    .catch(() => {
+                        fileStatus.textContent = `Could not load ${fileName}. Use Open file or Download, or check that the file exists in DataBase/resume.`;
+                        fileStatus.hidden = false;
+                    });
+            } else {
+                const docxPreview = document.getElementById('docx-preview');
+                docxPreview.hidden = false;
+                docxPreview.textContent = 'Loading document...';
+                fetch(fileUrl)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Could not load document.');
+                        return response.arrayBuffer();
+                    })
+                    .then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer }))
+                    .then(result => {
+                        docxPreview.innerHTML = DOMPurify.sanitize(result.value);
+                    })
+                    .catch(() => {
+                        docxPreview.textContent = 'This document could not be previewed. Use Open file or Download; DOCX preview also requires access to the viewer libraries.';
+                    });
+            }
+
+            window.addEventListener('load', () => {
+                window.setTimeout(() => downloadDocument(downloadUrl), 300);
+            });
+        } else {
+            fileStatus.textContent = fileName
+                ? 'Unsupported file. Choose a .pdf or .docx file.'
+                : 'No file selected. Add ?file=filename.pdf or ?file=filename.docx to the URL.';
+            fileStatus.hidden = false;
+        }
+
+        async function downloadDocument(downloadUrl) {
+            const status = document.getElementById('download-status');
+            try {
+                const response = await fetch(downloadUrl);
+                if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+
+                const objectUrl = URL.createObjectURL(await response.blob());
+                const downloadLink = document.createElement('a');
+                downloadLink.href = objectUrl;
+                downloadLink.download = fileName;
+                document.body.append(downloadLink);
+                downloadLink.click();
+                downloadLink.remove();
+                window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+                status.textContent = '';
+            } catch {
+                status.textContent = 'Download failed. The preview is still available; restart the backend if it has not been rebuilt.';
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -2,6 +2,9 @@
 #include <portfolio/service/PortfolioService.hpp>
 #include <portfolio/controller/PortfolioController.hpp>
 #include <portfolio/core/SecurityMiddleware.hpp>
+#include <algorithm>
+#include <cctype>
+#include <filesystem>
 #include <iostream>
 #include <thread>
 
@@ -43,7 +46,44 @@ bool Server::start() {
     controller::ApiController apiController(data_service_, stats_service_);
     apiController.registerRoutes(svr_);
 
+    svr_.Get("/resume/download", [](const httplib::Request& req, httplib::Response& res) {
+        const std::filesystem::path file_name(req.get_param_value("file"));
+        std::string extension = file_name.extension().string();
+        std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char character) {
+            return static_cast<char>(std::tolower(character));
+        });
+
+        if (file_name.empty() || file_name.filename() != file_name ||
+            (extension != ".pdf" && extension != ".docx")) {
+            res.status = httplib::StatusCode::BadRequest_400;
+            res.set_content("A PDF or DOCX filename is required.", "text/plain");
+            return;
+        }
+
+        const std::filesystem::path pdf_path = std::filesystem::path("./DataBase/resume") / file_name;
+        std::error_code file_error;
+        if (!std::filesystem::is_regular_file(pdf_path, file_error)) {
+            res.status = httplib::StatusCode::NotFound_404;
+            res.set_content("PDF not found.", "text/plain");
+            return;
+        }
+
+        std::string download_name = file_name.filename().string();
+        for (char& character : download_name) {
+            const auto value = static_cast<unsigned char>(character);
+            if (!std::isalnum(value) && character != '.' && character != '-' && character != '_') {
+                character = '_';
+            }
+        }
+        res.set_header("Content-Disposition", "attachment; filename=\"" + download_name + "\"");
+        const std::string content_type = extension == ".pdf"
+            ? "application/pdf"
+            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        res.set_file_content(pdf_path.string(), content_type);
+    });
+
     // ── Serve static files ──
+    svr_.set_mount_point("/resume/", "./DataBase/resume");
     // Serving both root and frontend for compatibility
     svr_.set_mount_point("/", "./frontend");
     svr_.set_mount_point("/static", "./static");

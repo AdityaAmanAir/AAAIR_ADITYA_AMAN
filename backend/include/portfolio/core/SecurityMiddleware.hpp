@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 
 namespace portfolio {
 namespace core {
@@ -37,26 +38,31 @@ public:
 
     // Post-routing handler: sets security headers on every response
     static void postRouting(const httplib::Request& req, httplib::Response& res) {
-        (void)req;
+        std::string extension = req.path.size() >= 4 ? req.path.substr(req.path.size() - 4) : "";
+        std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char character) {
+            return static_cast<char>(std::tolower(character));
+        });
+        const bool is_inline_resume_pdf = req.path.rfind("/resume/", 0) == 0 && extension == ".pdf";
         // Prevent MIME type sniffing
         res.set_header("X-Content-Type-Options", "nosniff");
 
         // Prevent clickjacking
-        res.set_header("X-Frame-Options", "DENY");
+        res.set_header("X-Frame-Options", is_inline_resume_pdf ? "SAMEORIGIN" : "DENY");
 
         // XSS protection (legacy browsers)
         res.set_header("X-XSS-Protection", "1; mode=block");
 
         // Content Security Policy
-        res.set_header("Content-Security-Policy",
+        std::string content_security_policy =
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
             "style-src 'self' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' https://github-readme-stats.vercel.app https://i.ibb.co data:; "
             "connect-src 'self' https://script.google.com https://script.googleusercontent.com; "
-            "frame-ancestors 'none'"
-        );
+            "frame-ancestors ";
+        content_security_policy += is_inline_resume_pdf ? "'self'" : "'none'";
+        res.set_header("Content-Security-Policy", content_security_policy);
 
         // Referrer policy (relaxed slightly for Chrome dev compatibility)
         res.set_header("Referrer-Policy", "no-referrer-when-downgrade");

@@ -35,7 +35,8 @@ int main() {
     loadEnv(".env");
 
     const std::string host = "0.0.0.0";
-    const int port = 80;
+    const char* port_value = std::getenv("PORT");
+    const int port = port_value ? std::stoi(port_value) : 80;
     const std::string data_path = "data.json";
 
     std::cout << "[Main] Initializing Generic Backend..." << std::endl;

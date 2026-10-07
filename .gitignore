@@ -1,8 +1,33 @@
 build/
 server
 portfolio_server
+
+# Local credentials and TLS material
 cert.pem
 key.pem
 .env
+.env.*
+!.env.example
+
+# AI model artifacts
 /AI_backend/*.gguf
 /AI_backend/runtime/
+
+# Keep resume viewer code in Git; keep uploaded documents local
+/DataBase/resume/*
+!/DataBase/resume/index.html
+!/DataBase/resume/viewer.css
+
+# Local editor and operating-system files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.a
+*.so
+*.dylib

@@ -58,7 +58,7 @@ On Amazon Linux 2, use `cmake3` instead of `cmake` in the build commands below.
 cd ~
 git clone https://github.com/AdityaAmanAir/AAAIR_ADITYA_AMAN.git
 cd ~/AAAIR_ADITYA_AMAN
-cmake -S . -B build && cmake --build build --parallel 1
+cmake -S . -B build && cmake --build build --parallel "$(nproc)"
 ```
 
 A successful build ends with `Built target server`. The executable is `build/server`.
@@ -163,7 +163,7 @@ After pulling code changes, rebuild and restart:
 cd ~/AAAIR_ADITYA_AMAN
 git pull
 cmake -S . -B build
-cmake --build build --parallel 1
+cmake --build build --parallel "$(nproc)"
 sudo systemctl restart portfolio
 ```
 
@@ -303,7 +303,7 @@ After pulling a change to the model launcher or AI backend, rebuild the C++ serv
 cd ~/AAAIR_ADITYA_AMAN
 git pull
 cmake -S . -B build
-cmake --build build --parallel 1
+cmake --build build --parallel "$(nproc)"
 sudo systemctl restart portfolio-ai
 sudo systemctl restart portfolio
 ```
