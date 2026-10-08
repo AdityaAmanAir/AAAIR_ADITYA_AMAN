@@ -235,6 +235,7 @@ Add:
 ```ini
 [Service]
 Environment=PORT=443
+Environment=HTTPS_HOST=adityaman.website
 Environment=TLS_CERT_PATH=/etc/portfolio/tls/fullchain.pem
 Environment=TLS_KEY_PATH=/etc/portfolio/tls/privkey.pem
 ```
@@ -263,7 +264,7 @@ sudo systemctl enable --now certbot-renew.timer
 sudo certbot renew --dry-run
 ```
 
-This direct TLS setup serves HTTPS on port 443. It does not redirect HTTP requests on port 80; use an Nginx reverse proxy or an ALB if you also need HTTP-to-HTTPS redirects. Keep the TLS private key readable by the service account only as required by your systemd setup, and never commit either certificate file.
+With TLS configured, the native C++ server listens for HTTPS on port 443 and redirects HTTP requests on port 80 to `HTTPS_HOST`, preserving the path, query, and request method. Set `HTTPS_HOST` to the canonical hostname only, without a scheme or trailing slash. Both ports must be allowed in the EC2 security group. Keep the TLS private key readable by the service account only as required by your systemd setup, and never commit either certificate file.
 
 ## ECS requirements
 

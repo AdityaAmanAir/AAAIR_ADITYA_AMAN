@@ -53,10 +53,10 @@ Keep the terminal open while the server is running, then visit `http://localhost
 To serve HTTPS directly, provide a certificate chain and private key and use port 443 (or set another `PORT`):
 
 ```bash
-TLS_CERT_PATH=/path/to/fullchain.pem TLS_KEY_PATH=/path/to/privkey.pem ./build/server
+TLS_CERT_PATH=/path/to/fullchain.pem TLS_KEY_PATH=/path/to/privkey.pem HTTPS_HOST=localhost PORT=8443 HTTP_PORT=8080 ./build/server
 ```
 
-Both TLS variables are required. When both are set and `PORT` is omitted, the server listens on `https://localhost:443`.
+Both TLS variables and `HTTPS_HOST` are required. With no port overrides, HTTPS listens on port `443` and HTTP redirects from port `80`. `HTTP_PORT` is available for local testing without privileged ports.
 
 To run on an unprivileged local port instead of port 80:
 
