@@ -11,13 +11,31 @@
 namespace portfolio {
 namespace core {
 
-Server::Server(const std::string& host, int port, const std::string& data_path)
+Server::Server(const std::string& host, int port, const std::string& data_path,
+               const std::string& certificate_path, const std::string& private_key_path)
     : host_(host), port_(port), data_path_(data_path),
+      certificate_path_(certificate_path), private_key_path_(private_key_path),
       thread_count_(std::max(4u, std::thread::hardware_concurrency())) {}
 
 bool Server::start() {
+    if (certificate_path_.empty() != private_key_path_.empty()) {
+        std::cerr << "[Server] Both TLS_CERT_PATH and TLS_KEY_PATH must be configured for HTTPS" << std::endl;
+        return false;
+    }
+
+    if (!certificate_path_.empty()) {
+        svr_ = std::make_unique<httplib::SSLServer>(certificate_path_.c_str(), private_key_path_.c_str());
+        if (!svr_->is_valid()) {
+            std::cerr << "[Server] Failed to load TLS certificate or private key" << std::endl;
+            return false;
+        }
+    } else {
+        svr_ = std::make_unique<httplib::Server>();
+    }
+    auto& server = *svr_;
+
     // ── Dual-Stack (IPv4 & IPv6) Socket Configuration ──
-    svr_.set_socket_options([](socket_t sock) {
+    server.set_socket_options([](socket_t sock) {
         int opt = 1;
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(opt));
 #ifdef IPV6_V6ONLY
@@ -27,16 +45,16 @@ bool Server::start() {
     });
 
     // ── Multi-threading ──
-    svr_.new_task_queue = [this] {
+    server.new_task_queue = [this] {
         return new httplib::ThreadPool(thread_count_);
     };
 
     // ── Security middleware ──
-    svr_.set_pre_routing_handler(SecurityMiddleware::preRouting);
-    svr_.set_post_routing_handler(SecurityMiddleware::postRouting);
+    server.set_pre_routing_handler(SecurityMiddleware::preRouting);
+    server.set_post_routing_handler(SecurityMiddleware::postRouting);
 
     // ── Error handlers ──
-    svr_.set_error_handler([](const httplib::Request&, httplib::Response& res) {
+    server.set_error_handler([](const httplib::Request&, httplib::Response& res) {
         std::string body = "{\"error\":\"" + std::to_string(res.status) + "\", \"message\":\"Resource not found or server error\"}";
         res.set_content(body, "application/json");
     });
@@ -44,9 +62,9 @@ bool Server::start() {
     // ── Register API routes ──
     data_service_.load(data_path_);
     controller::ApiController apiController(data_service_, stats_service_);
-    apiController.registerRoutes(svr_);
+    apiController.registerRoutes(server);
 
-    svr_.Get("/resume/download", [](const httplib::Request& req, httplib::Response& res) {
+    server.Get("/resume/download", [](const httplib::Request& req, httplib::Response& res) {
         const std::filesystem::path file_name(req.get_param_value("file"));
         std::string extension = file_name.extension().string();
         std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char character) {
@@ -83,21 +101,23 @@ bool Server::start() {
     });
 
     // ── Serve static files ──
-    svr_.set_mount_point("/resume/", "./DataBase/resume");
+    server.set_mount_point("/resume/", "./DataBase/resume");
     // Serving both root and frontend for compatibility
-    svr_.set_mount_point("/", "./frontend");
-    svr_.set_mount_point("/static", "./static");
+    server.set_mount_point("/", "./frontend");
+    server.set_mount_point("/static", "./static");
 
-    if (!svr_.bind_to_port(host_, port_)) {
-        std::cerr << "[Server] Failed to bind http://" << host_ << ":" << port_ << std::endl;
+    if (!server.bind_to_port(host_, port_)) {
+        std::cerr << "[Server] Failed to bind " << (certificate_path_.empty() ? "http://" : "https://")
+                  << host_ << ":" << port_ << std::endl;
         if (port_ < 1024) {
             std::cerr << "[Server] Ports below 1024 may require elevated privileges; try: sudo ./build/server" << std::endl;
         }
         return false;
     }
 
-    std::cout << "[Server] Listening on http://" << host_ << ":" << port_ << " (threads: " << thread_count_ << ")" << std::endl;
-    return svr_.listen_after_bind();
+    std::cout << "[Server] Listening on " << (certificate_path_.empty() ? "http://" : "https://")
+              << host_ << ":" << port_ << " (threads: " << thread_count_ << ")" << std::endl;
+    return server.listen_after_bind();
 }
 
 } // namespace core

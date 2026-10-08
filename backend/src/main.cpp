@@ -1,6 +1,5 @@
 #include <portfolio/core/Server.hpp>
 #include <iostream>
-#include <thread>
 #include <fstream>
 #include <string>
 #include <cstdlib>
@@ -36,18 +35,20 @@ int main() {
 
     const std::string host = "0.0.0.0";
     const char* port_value = std::getenv("PORT");
-    const int port = port_value ? std::stoi(port_value) : 80;
+    const char* certificate_value = std::getenv("TLS_CERT_PATH");
+    const char* private_key_value = std::getenv("TLS_KEY_PATH");
+    const std::string certificate_path = certificate_value ? certificate_value : "";
+    const std::string private_key_path = private_key_value ? private_key_value : "";
+    const bool https_enabled = !certificate_path.empty() && !private_key_path.empty();
+    if (certificate_path.empty() != private_key_path.empty()) {
+        std::cerr << "[Main] Set both TLS_CERT_PATH and TLS_KEY_PATH to enable HTTPS" << std::endl;
+        return 1;
+    }
+    const int port = port_value ? std::stoi(port_value) : (https_enabled ? 443 : 80);
     const std::string data_path = "data.json";
 
     std::cout << "[Main] Initializing Generic Backend..." << std::endl;
 
-    bool server_started = false;
-    std::thread http_thread([&]() {
-        portfolio::core::Server http_server(host, port, data_path);
-        server_started = http_server.start();
-    });
-
-    http_thread.join();
-
-    return server_started ? 0 : 1;
+    portfolio::core::Server server(host, port, data_path, certificate_path, private_key_path);
+    return server.start() ? 0 : 1;
 }

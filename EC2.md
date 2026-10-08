@@ -1,6 +1,6 @@
 # Deploying on a New AWS EC2 Instance
 
-This guide is for the current project version. The C++ server serves **HTTP on port 80**. HTTPS is not enabled by the current source code, so do not request a TLS certificate or expect `https://` to work with this build.
+The C++ server supports HTTP by default and native HTTPS when configured with a TLS certificate and private key. This guide covers direct HTTPS on EC2 and the recommended Application Load Balancer (ALB) setup for ECS.
 
 These steps assume **Amazon Linux 2023** and the default `ec2-user` account.
 
@@ -8,7 +8,7 @@ These steps assume **Amazon Linux 2023** and the default `ec2-user` account.
 
 - Select Amazon Linux 2023.
 - Allow inbound SSH on TCP port `22` from your own IP address.
-- Allow inbound HTTP on TCP port `80` from `0.0.0.0/0` (and `::/0` if using IPv6).
+- Allow inbound HTTP on TCP port `80` and HTTPS on TCP port `443` from `0.0.0.0/0` (and `::/0` if using IPv6). Port 80 is needed for Let's Encrypt certificate issuance and renewal.
 - An Elastic IP keeps the public address stable. Without one, the public IPv4 address can change after stopping and starting the instance.
 
 Connect using the SSH command shown by the EC2 console. On the instance, check the OS if unsure:
@@ -135,7 +135,7 @@ Follow new log messages live:
 sudo journalctl -u portfolio -f
 ```
 
-You can now close SSH. The service keeps running. Visit `http://YOUR_EC2_PUBLIC_IP/` in a browser.
+You can now close SSH. The service keeps running. Without TLS environment variables, visit `http://YOUR_EC2_PUBLIC_IP/` in a browser. To enable HTTPS with a domain and certificate, follow the HTTPS section below.
 
 ## 6. Start, stop, and update
 
@@ -202,11 +202,84 @@ dig +short adityaman.website
 dig +short www.adityaman.website
 ```
 
-The returned address should be the EC2 Elastic IP. With the current HTTP-only application, visit `http://adityaman.website/`.
+The returned address should be the EC2 Elastic IP. Once TLS is configured, visit `https://adityaman.website/`.
 
-## HTTPS note
+## HTTPS on EC2
 
-The current `backend/src/main.cpp` starts a plain HTTP server on port 80, and the current `CMakeLists.txt` does not enable TLS. A certificate alone does not make this program speak HTTPS. HTTPS requires changing the server implementation and build configuration to use TLS, or deploying a separate TLS endpoint. Do not run Certbot's standalone HTTP challenge while this server is occupying port 80; stop the service first if using that challenge after HTTPS support is configured.
+The server uses its built-in TLS support when both `TLS_CERT_PATH` and `TLS_KEY_PATH` are set. It defaults to port `443` in that mode; `PORT` can override it. Without both variables, it remains an HTTP server on port `80`.
+
+First, point your domain's DNS `A` record at the EC2 Elastic IP and make sure inbound ports `80` and `443` are allowed. Install Certbot and issue a certificate. The standalone challenge needs port 80 to be free, so stop the existing HTTP service during issuance:
+
+```bash
+sudo dnf install -y certbot
+sudo systemctl stop portfolio
+sudo certbot certonly --standalone -d adityaman.website -d www.adityaman.website
+```
+
+The systemd service runs as `ec2-user`, while Certbot keeps its private key root-only. Copy the certificate into a restricted directory readable by that service account:
+
+```bash
+sudo install -d -o ec2-user -g ec2-user -m 700 /etc/portfolio/tls
+sudo install -o ec2-user -g ec2-user -m 644 /etc/letsencrypt/live/adityaman.website/fullchain.pem /etc/portfolio/tls/fullchain.pem
+sudo install -o ec2-user -g ec2-user -m 600 /etc/letsencrypt/live/adityaman.website/privkey.pem /etc/portfolio/tls/privkey.pem
+```
+
+Configure the service to use these copies. Replace the domain in the Certbot paths above if yours differs:
+
+```bash
+sudo systemctl edit portfolio
+```
+
+Add:
+
+```ini
+[Service]
+Environment=PORT=443
+Environment=TLS_CERT_PATH=/etc/portfolio/tls/fullchain.pem
+Environment=TLS_KEY_PATH=/etc/portfolio/tls/privkey.pem
+```
+
+Then restart and verify the service and HTTPS response:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now portfolio
+sudo systemctl status portfolio
+curl -I https://adityaman.website/
+```
+
+Certbot renews the certificate files, but the running C++ server loads them only on startup. Restart it after renewal:
+
+```bash
+sudo install -d /etc/letsencrypt/renewal-hooks/deploy
+sudo tee /etc/letsencrypt/renewal-hooks/deploy/restart-portfolio.sh > /dev/null <<'EOF'
+#!/bin/sh
+install -o ec2-user -g ec2-user -m 644 /etc/letsencrypt/live/adityaman.website/fullchain.pem /etc/portfolio/tls/fullchain.pem
+install -o ec2-user -g ec2-user -m 600 /etc/letsencrypt/live/adityaman.website/privkey.pem /etc/portfolio/tls/privkey.pem
+systemctl restart portfolio
+EOF
+sudo chmod 755 /etc/letsencrypt/renewal-hooks/deploy/restart-portfolio.sh
+sudo systemctl enable --now certbot-renew.timer
+sudo certbot renew --dry-run
+```
+
+This direct TLS setup serves HTTPS on port 443. It does not redirect HTTP requests on port 80; use an Nginx reverse proxy or an ALB if you also need HTTP-to-HTTPS redirects. Keep the TLS private key readable by the service account only as required by your systemd setup, and never commit either certificate file.
+
+## ECS requirements
+
+For ECS, use an ALB to terminate public HTTPS rather than putting a public certificate in each task. The browser connects to the ALB over HTTPS; the ALB forwards HTTP to the private ECS task. The C++ server needs no certificate in the task in this layout.
+
+- Create an ECR repository and build/push a container image containing `build/server`, `data.json`, `frontend/`, and any public files from `DataBase/resume/`. This repository does not currently include a Dockerfile, so container image packaging is a required deployment step.
+- Create an ECS cluster and a Fargate task definition using Linux `X86_64`. The bundled llama.cpp runtime is Ubuntu x64 and does not run on ARM/Graviton as currently supplied.
+- Set the web container's `PORT=8080`; leave `TLS_CERT_PATH` and `TLS_KEY_PATH` unset. Configure the ALB target group for HTTP on container port `8080`, with a health check on `/`.
+- Request or import a certificate in AWS Certificate Manager (ACM) for the domain in the same AWS region as the ALB. Add an ALB HTTPS listener on `443` using that certificate, and optionally an HTTP listener on `80` that redirects to HTTPS.
+- Give the ALB security group inbound `80`/`443` access from the internet. Give the task security group inbound access to `8080` only from the ALB security group; do not expose the task or model port publicly.
+- The current AI route calls `127.0.0.1:8081`. Run the model in a sidecar container in the same ECS task so the task's shared network namespace can use that loopback endpoint. Keep the sidecar bound to loopback and configure task startup/health checks so the web container does not receive traffic before the model is ready.
+- Allocate at least `4 GiB` of task memory for the model and backend together; `8 GiB` is a more practical starting point, with at least `2 vCPU` for responsive CPU inference. Load-test and raise the task size based on concurrency. The model launcher downloads its model/runtime if missing, so provide outbound internet access (NAT for private subnets) or package/cache those assets in the image or persistent storage.
+- Put `.env` secrets in AWS Secrets Manager or Systems Manager Parameter Store and map them into the task definition. Send container logs to CloudWatch Logs. Store resume files in the image for a small static site or move them to durable storage such as S3/EFS before scaling tasks; task-local filesystem changes are not durable across replacement.
+- Add Route 53 alias records (or DNS records at your provider) to the ALB. The EC2 Elastic IP and EC2 Certbot steps above do not apply to this ECS/ALB setup.
+
+An ECS deployment is not complete until the web and model images/task definition are built, the ALB health check passes, and both `https://YOUR_DOMAIN/` and the AI route have been tested through the ALB.
 
 ## Local AI backend (Gemma)
 
@@ -216,7 +289,7 @@ This section supplements the deployment steps above. The AI backend is a local `
 
 - Use an x86_64 instance; `AI_backend/start-model.sh` downloads the pinned Ubuntu x64 llama.cpp runtime. The bundled runtime is not for Graviton/ARM instances.
 - Use an x86_64 instance with at least 4 GiB of RAM; 8 GiB is preferable if other services run on the instance. The model file is about 681 MiB and uses a 1024-token context. Instances with 1-2 GiB of RAM may rely heavily on swap and respond slowly; a t3.nano is not suitable.
-- Keep the EC2 security group open for SSH on port 22 and the website on port 80 only. The model binds to `127.0.0.1:8081`; do not expose port 8081 publicly.
+- Keep the EC2 security group open for SSH on port 22, the website on port 443, and port 80 for Let's Encrypt validation. The model binds to `127.0.0.1:8081`; do not expose port 8081 publicly.
 - The first model start downloads the model and llama.cpp runtime. The script verifies pinned SHA-256 checksums before launching. Subsequent starts reuse those files.
 
 Check the instance architecture and memory before continuing:

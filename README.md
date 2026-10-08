@@ -41,7 +41,7 @@ Start the server from the project root:
 ./build/server
 ```
 
-The server listens on `http://localhost:80`. Port 80 may require administrator
+The server listens on `http://localhost:80` by default. Port 80 may require administrator
 privileges:
 
 ```bash
@@ -49,6 +49,14 @@ sudo ./build/server
 ```
 
 Keep the terminal open while the server is running, then visit `http://localhost` in a browser.
+
+To serve HTTPS directly, provide a certificate chain and private key and use port 443 (or set another `PORT`):
+
+```bash
+TLS_CERT_PATH=/path/to/fullchain.pem TLS_KEY_PATH=/path/to/privkey.pem ./build/server
+```
+
+Both TLS variables are required. When both are set and `PORT` is omitted, the server listens on `https://localhost:443`.
 
 To run on an unprivileged local port instead of port 80:
 
@@ -67,7 +75,7 @@ http://localhost/resume/?file=AdityaAman_AmazonML2026_Resume-1.pdf
 http://localhost/resume/?file=CSE3001_DBMS_Lab_Experiments_1_to_11.docx
 ```
 
-When running locally on port `8000`, use `http://localhost:8000/resume/?file=FILENAME.pdf`. On the deployed site, use `http://adityaman.website/resume/?file=FILENAME.pdf` (the current server is HTTP-only). The viewer does not list every file; open each one by filename. DOCX preview uses browser libraries from jsDelivr and requires internet access; downloading the original file does not.
+When running locally on port `8000`, use `http://localhost:8000/resume/?file=FILENAME.pdf`. On the deployed site, use `https://adityaman.website/resume/?file=FILENAME.pdf` when TLS is configured. The viewer does not list every file; open each one by filename. DOCX preview uses browser libraries from jsDelivr and requires internet access; downloading the original file does not.
 
 ## Clean Rebuild
 
