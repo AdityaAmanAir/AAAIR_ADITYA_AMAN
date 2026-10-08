@@ -309,3 +309,41 @@ sudo systemctl restart portfolio
 ```
 
 If the model URL, checksum, or llama.cpp runtime changes, inspect `AI_backend/start-model.sh` and verify the new artifacts before restarting. Gemma's weights are subject to Google's Gemma Terms of Use.
+
+```bash
+cd ~/AAAIR_ADITYA_AMAN
+cmake -S . -B build
+
+(
+set -euo pipefail
+SWAPFILE=/swapfile
+
+if [[ -e "$SWAPFILE" ]] || sudo swapon --show=NAME --noheadings | grep -Fxq "$SWAPFILE"; then
+  echo "$SWAPFILE already exists or is active; leaving it untouched."
+  exit 1
+fi
+
+cleanup() {
+  result=$?
+  trap - EXIT
+  if sudo swapon --show=NAME --noheadings | grep -Fxq "$SWAPFILE"; then
+    sudo swapoff "$SWAPFILE" || {
+      echo "Could not disable swap; leaving $SWAPFILE in place." >&2
+      exit 1
+    }
+  fi
+  if [[ -e "$SWAPFILE" ]]; then
+    sudo rm -f -- "$SWAPFILE"
+  fi
+  exit "$result"
+}
+trap cleanup EXIT
+
+sudo fallocate -l 2G "$SWAPFILE"
+sudo chmod 600 "$SWAPFILE"
+sudo mkswap "$SWAPFILE"
+sudo swapon "$SWAPFILE"
+
+cmake --build build --parallel 1
+)
+```
